@@ -18,7 +18,7 @@ std::vector<std::string> RecordCodec::split(std::string_view line) {
     for (size_t i = 0; i < line.size(); ++i) {
         char c = line[i];
         if (esc) {
-            // accept any escaped character literally (e.g. \ or \|)
+            // 转义后的字符按字面值处理
             cur.push_back(c);
             esc = false;
         } else if (c == '\\') {
@@ -30,7 +30,7 @@ std::vector<std::string> RecordCodec::split(std::string_view line) {
             cur.push_back(c);
         }
     }
-    // if line ends with escape, treat trailing backslash as literal
+    // 行尾反斜杠按普通字符保留
     if (esc) {
         cur.push_back('\\');
     }
@@ -41,7 +41,7 @@ std::vector<std::string> RecordCodec::split(std::string_view line) {
 std::string RecordCodec::join(const std::vector<std::string>& fields) {
     char delim = delimiter();
     std::string out;
-    // estimate size
+    // 预估容量，减少扩容次数
     size_t tot = 0;
 
     for (const auto& f : fields) {
@@ -76,12 +76,12 @@ std::string UserRecordCodec::encode(const User& user) {
 
 User UserRecordCodec::decode(const std::string_view line) {
     std::vector<std::string> fields = split(line);
-    return User(fields[0],                                // username
-                fields[1],                                // name
-                fields[2],                                // phone
-                fields[3],                                // password
-                fields[4],                                // address
-                exf::util::Money::from_string(fields[5])  // initial balance
+    return User(fields[0],                                // 用户名
+                fields[1],                                // 姓名
+                fields[2],                                // 手机号
+                fields[3],                                // 密码
+                fields[4],                                // 地址
+                exf::util::Money::from_string(fields[5])  // 初始余额
     );
 }
 
