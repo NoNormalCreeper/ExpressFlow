@@ -6,21 +6,21 @@
 namespace exf::util {
 
 class Money {
-public:
+   public:
     constexpr Money() noexcept : value_(0) {}
     constexpr explicit Money(int64_t raw_value) noexcept : value_(raw_value) {}
 
     static constexpr Money from_double(double value) noexcept {
-        return Money(static_cast<int64_t>(value * 10000));
+        const double scaled = value * 10000.0;
+        return Money(
+            static_cast<int64_t>(scaled >= 0.0 ? scaled + 0.5 : scaled - 0.5));
     }
 
     constexpr double to_double() const noexcept {
         return static_cast<double>(value_) / 10000.0;
     }
 
-    constexpr int64_t raw_value() const noexcept {
-        return value_;
-    }
+    constexpr int64_t raw_value() const noexcept { return value_; }
 
     static Money from_string(const std::string& value) {
         return from_double(std::stod(value));
@@ -85,7 +85,8 @@ public:
     constexpr bool operator>=(const Money& rhs) const noexcept {
         return value_ >= rhs.value_;
     }
-private:
+
+   private:
     int64_t value_;
 };
 
@@ -93,5 +94,4 @@ inline std::string to_string(const Money& money) {
     return std::to_string(money.to_double());
 }
 
-
-} // namespace exf::util
+}  // namespace exf::util
