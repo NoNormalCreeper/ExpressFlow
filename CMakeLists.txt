@@ -68,6 +68,8 @@ endif()
 
 add_executable(unit_tests
     tests/domain/AccountTest.cpp
+    tests/repository/UserRepositoryTest.cpp
+    tests/service/UserServiceTest.cpp
     tests/storage/FileStorageTest.cpp
     tests/storage/RecordCodecTest.cpp
     tests/storage/UserRecordCodecTest.cpp

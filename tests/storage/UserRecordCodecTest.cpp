@@ -30,4 +30,9 @@ TEST(UserRecordCodecTest, EncodesAndDecodesUserWithEscapedFields) {
               user.account().balance().raw_value());
 }
 
+TEST(UserRecordCodecTest, RejectsRecordsWithWrongFieldCount) {
+    EXPECT_THROW(UserRecordCodec::decode("only|five|fields|are|here"),
+                 std::runtime_error);
+}
+
 }  // namespace
