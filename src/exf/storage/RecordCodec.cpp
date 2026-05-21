@@ -1,5 +1,9 @@
 #include "exf/storage/RecordCodec.hpp"
+
 #include "exf/domain/User.hpp"
+
+#include <stdexcept>
+#include <utility>
 
 namespace exf {
 
@@ -76,6 +80,10 @@ std::string UserRecordCodec::encode(const User& user) {
 
 User UserRecordCodec::decode(const std::string_view line) {
     std::vector<std::string> fields = split(line);
+    if (fields.size() != 6) {
+        throw std::runtime_error("Invalid user record: " + std::string(line));
+    }
+
     return User(fields[0],                                // 用户名
                 fields[1],                                // 姓名
                 fields[2],                                // 手机号
