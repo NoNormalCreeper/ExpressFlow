@@ -1,5 +1,6 @@
 #pragma once
 
+#include "exf/storage/FileStorage.hpp"
 namespace exf {
 
 /**
@@ -10,12 +11,16 @@ class UserRepository {
     /**
      * 创建仓储占位对象。
      */
-    UserRepository();
+    UserRepository(const FileStorage& storage)
+        : storage_(storage) {}
 
     /**
      * 返回仓储占位对象是否可用。
      */
     bool isReady() const;
+
+   private:
+    const FileStorage& storage_;
 };
 
 }  // namespace exf

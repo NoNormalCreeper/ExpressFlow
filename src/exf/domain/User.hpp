@@ -1,6 +1,7 @@
 #pragma once
 
 #include "exf/domain/Account.hpp"
+#include "exf/util/Money.hpp"
 
 #include <string>
 
@@ -24,7 +25,7 @@ class User {
          std::string phone,
          std::string password,
          std::string address,
-         double initialBalance);
+         util::Money initialBalance);
 
     /**
      * 返回唯一用户名。

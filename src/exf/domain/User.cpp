@@ -5,7 +5,7 @@
 namespace exf {
 
 // 创建空用户占位对象。
-User::User() : account_(0.0) {}
+User::User() : account_() {}
 
 // 保存用户身份信息和余额。
 User::User(std::string username,
@@ -13,7 +13,7 @@ User::User(std::string username,
            std::string phone,
            std::string password,
            std::string address,
-           double initialBalance)
+           util::Money initialBalance)
     : username_(std::move(username)),
       name_(std::move(name)),
       phone_(std::move(phone)),
