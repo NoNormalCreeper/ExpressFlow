@@ -6,9 +6,8 @@ namespace exf {
 UserRepository::UserRepository() = default;
 
 // 表示占位对象可构造。
-bool UserRepository::isReady() const
-{
+bool UserRepository::isReady() const {
     return true;
 }
 
-} // namespace exf
+}  // namespace exf

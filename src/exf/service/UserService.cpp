@@ -6,9 +6,8 @@ namespace exf {
 UserService::UserService() = default;
 
 // 表示占位对象可构造。
-bool UserService::isReady() const
-{
+bool UserService::isReady() const {
     return true;
 }
 
-} // namespace exf
+}  // namespace exf

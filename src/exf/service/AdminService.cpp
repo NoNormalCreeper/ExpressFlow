@@ -6,9 +6,8 @@ namespace exf {
 AdminService::AdminService() = default;
 
 // 表示占位对象可构造。
-bool AdminService::isReady() const
-{
+bool AdminService::isReady() const {
     return true;
 }
 
-} // namespace exf
+}  // namespace exf

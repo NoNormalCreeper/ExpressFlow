@@ -6,9 +6,8 @@ namespace exf {
 ParcelService::ParcelService() = default;
 
 // 返回阶段 1 要求的固定价格。
-double ParcelService::stage1ParcelPrice() const
-{
+double ParcelService::stage1ParcelPrice() const {
     return 15.0;
 }
 
-} // namespace exf
+}  // namespace exf

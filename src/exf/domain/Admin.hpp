@@ -10,7 +10,7 @@ namespace exf {
  * Admin 表示阶段 1 的物流公司管理员。
  */
 class Admin {
-public:
+   public:
     /**
      * 为仓储占位创建空管理员对象。
      */
@@ -19,7 +19,10 @@ public:
     /**
      * 用身份信息和初始余额创建管理员。
      */
-    Admin(std::string username, std::string name, std::string password, double initialBalance);
+    Admin(std::string username,
+          std::string name,
+          std::string password,
+          double initialBalance);
 
     /**
      * 返回唯一管理员用户名。
@@ -41,7 +44,7 @@ public:
      */
     const Account& account() const;
 
-private:
+   private:
     /** 唯一管理员用户名。 */
     std::string username_;
 
@@ -55,4 +58,4 @@ private:
     Account account_;
 };
 
-} // namespace exf
+}  // namespace exf

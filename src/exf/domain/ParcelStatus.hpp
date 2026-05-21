@@ -13,4 +13,4 @@ enum class ParcelStatus {
     Signed
 };
 
-} // namespace exf
+}  // namespace exf

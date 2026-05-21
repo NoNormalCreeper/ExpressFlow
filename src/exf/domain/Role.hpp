@@ -13,4 +13,4 @@ enum class Role {
     Admin
 };
 
-} // namespace exf
+}  // namespace exf

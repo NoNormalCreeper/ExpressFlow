@@ -10,7 +10,7 @@ namespace exf {
  * Parcel 保存阶段 1 中寄件人和收件人的包裹记录。
  */
 class Parcel {
-public:
+   public:
     /**
      * 为仓储占位创建空包裹。
      */
@@ -66,7 +66,7 @@ public:
      */
     void markSigned(std::string receivedAt);
 
-private:
+   private:
     /** 包裹单号。 */
     std::string id_;
 
@@ -89,4 +89,4 @@ private:
     ParcelStatus status_;
 };
 
-} // namespace exf
+}  // namespace exf

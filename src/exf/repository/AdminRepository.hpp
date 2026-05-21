@@ -6,7 +6,7 @@ namespace exf {
  * AdminRepository 是阶段 1 的管理员持久化占位类。
  */
 class AdminRepository {
-public:
+   public:
     /**
      * 创建仓储占位对象。
      */
@@ -18,4 +18,4 @@ public:
     bool isReady() const;
 };
 
-} // namespace exf
+}  // namespace exf

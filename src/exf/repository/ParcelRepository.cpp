@@ -6,9 +6,8 @@ namespace exf {
 ParcelRepository::ParcelRepository() = default;
 
 // 表示占位对象可构造。
-bool ParcelRepository::isReady() const
-{
+bool ParcelRepository::isReady() const {
     return true;
 }
 
-} // namespace exf
+}  // namespace exf

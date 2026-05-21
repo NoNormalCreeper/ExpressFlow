@@ -10,7 +10,7 @@ namespace exf {
  * User 保存阶段 1 所需的用户账户信息。
  */
 class User {
-public:
+   public:
     /**
      * 为仓储占位创建空用户对象。
      */
@@ -61,7 +61,7 @@ public:
      */
     void setPassword(std::string password);
 
-private:
+   private:
     /** 平台唯一用户名。 */
     std::string username_;
 
@@ -81,4 +81,4 @@ private:
     Account account_;
 };
 
-} // namespace exf
+}  // namespace exf

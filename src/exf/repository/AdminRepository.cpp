@@ -6,9 +6,8 @@ namespace exf {
 AdminRepository::AdminRepository() = default;
 
 // 表示占位对象可构造。
-bool AdminRepository::isReady() const
-{
+bool AdminRepository::isReady() const {
     return true;
 }
 
-} // namespace exf
+}  // namespace exf

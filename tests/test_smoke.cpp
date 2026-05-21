@@ -5,8 +5,7 @@
 #include <cassert>
 #include <string>
 
-int main()
-{
+int main() {
     const exf::Role role = exf::Role::User;
     const exf::ParcelStatus status = exf::ParcelStatus::WaitingForSign;
 

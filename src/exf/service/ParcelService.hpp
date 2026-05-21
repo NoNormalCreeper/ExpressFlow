@@ -6,7 +6,7 @@ namespace exf {
  * ParcelService 负责后续寄件、签收和查询流程。
  */
 class ParcelService {
-public:
+   public:
     /**
      * 创建服务占位对象。
      */
@@ -18,4 +18,4 @@ public:
     double stage1ParcelPrice() const;
 };
 
-} // namespace exf
+}  // namespace exf

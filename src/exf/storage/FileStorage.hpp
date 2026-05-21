@@ -8,7 +8,7 @@ namespace exf {
  * FileStorage 保存文本文件持久化要使用的根目录。
  */
 class FileStorage {
-public:
+   public:
     /**
      * 用当前目录作为根目录创建存储对象。
      */
@@ -24,9 +24,9 @@ public:
      */
     const std::filesystem::path& basePath() const;
 
-private:
+   private:
     /** 后续数据文件的根目录。 */
     std::filesystem::path basePath_;
 };
 
-} // namespace exf
+}  // namespace exf

@@ -8,7 +8,7 @@ namespace exf {
  * Validator 提供服务层使用的简单输入校验工具。
  */
 class Validator {
-public:
+   public:
     /**
      * 判断值是否包含非空白内容。
      */
@@ -20,4 +20,4 @@ public:
     static bool isPositiveAmount(double amount);
 };
 
-} // namespace exf
+}  // namespace exf

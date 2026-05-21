@@ -6,7 +6,7 @@ namespace exf {
  * AuthService 负责后续注册、登录和改密流程。
  */
 class AuthService {
-public:
+   public:
     /**
      * 创建服务占位对象。
      */
@@ -18,4 +18,4 @@ public:
     bool isReady() const;
 };
 
-} // namespace exf
+}  // namespace exf

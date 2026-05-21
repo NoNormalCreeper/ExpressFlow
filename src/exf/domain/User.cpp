@@ -19,50 +19,41 @@ User::User(std::string username,
       phone_(std::move(phone)),
       password_(std::move(password)),
       address_(std::move(address)),
-      account_(initialBalance)
-{
-}
+      account_(initialBalance) {}
 
 // 返回唯一用户名。
-const std::string& User::username() const
-{
+const std::string& User::username() const {
     return username_;
 }
 
 // 返回用户真实姓名。
-const std::string& User::name() const
-{
+const std::string& User::name() const {
     return name_;
 }
 
 // 返回手机号。
-const std::string& User::phone() const
-{
+const std::string& User::phone() const {
     return phone_;
 }
 
 // 返回密码占位值。
-const std::string& User::password() const
-{
+const std::string& User::password() const {
     return password_;
 }
 
 // 返回收件地址。
-const std::string& User::address() const
-{
+const std::string& User::address() const {
     return address_;
 }
 
 // 返回用户账户。
-const Account& User::account() const
-{
+const Account& User::account() const {
     return account_;
 }
 
 // 替换已保存的密码。
-void User::setPassword(std::string password)
-{
+void User::setPassword(std::string password) {
     password_ = std::move(password);
 }
 
-} // namespace exf
+}  // namespace exf

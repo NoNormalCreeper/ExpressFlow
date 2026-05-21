@@ -6,7 +6,7 @@ namespace exf {
  * AdminService 负责阶段 1 的管理员业务操作。
  */
 class AdminService {
-public:
+   public:
     /**
      * 创建服务占位对象。
      */
@@ -18,4 +18,4 @@ public:
     bool isReady() const;
 };
 
-} // namespace exf
+}  // namespace exf

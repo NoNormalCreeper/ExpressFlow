@@ -6,7 +6,7 @@ namespace exf {
  * Account 保存用户或管理员的简单余额。
  */
 class Account {
-public:
+   public:
     /**
      * 用指定初始余额创建账户。
      */
@@ -32,9 +32,9 @@ public:
      */
     bool debit(double amount);
 
-private:
+   private:
     /** 当前账户余额。 */
     double balance_;
 };
 
-} // namespace exf
+}  // namespace exf

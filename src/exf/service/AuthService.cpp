@@ -6,9 +6,8 @@ namespace exf {
 AuthService::AuthService() = default;
 
 // 表示占位对象可构造。
-bool AuthService::isReady() const
-{
+bool AuthService::isReady() const {
     return true;
 }
 
-} // namespace exf
+}  // namespace exf
