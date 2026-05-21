@@ -1,6 +1,8 @@
 #pragma once
 
 #include <filesystem>
+#include <string>
+#include <vector>
 
 namespace exf {
 
@@ -23,6 +25,18 @@ class FileStorage {
      * 返回已配置的根路径。
      */
     const std::filesystem::path& basePath() const;
+
+    /**
+     * 从相对于根路径的文本文件中读取所有行。假定数据量不太大，适合一次性加载到内存中。
+     */
+    std::vector<std::string> readLines(
+        const std::filesystem::path& relativePath) const;
+
+    /**
+     * 将文本行写入相对于根路径的文本文件。假定数据量不太大，适合一次性写入内存中的内容。
+     */
+    void writeLines(const std::filesystem::path& relativePath,
+                    const std::vector<std::string>& lines) const;
 
    private:
     /** 后续数据文件的根目录。 */
