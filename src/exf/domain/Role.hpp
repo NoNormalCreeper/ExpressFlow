@@ -3,13 +3,13 @@
 namespace exf {
 
 /**
- * Role lists the login identities required by stage 1.
+ * Role 列出阶段 1 需要的登录身份。
  */
 enum class Role {
-    /** Normal platform user. */
+    /** 普通平台用户。 */
     User,
 
-    /** Logistics company administrator. */
+    /** 物流公司管理员。 */
     Admin
 };
 

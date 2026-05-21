@@ -4,7 +4,7 @@
 
 namespace exf {
 
-// Prints the stage 1 placeholder menu.
+// 打印阶段 1 的占位菜单。
 int Stage1ConsoleApp::run() const
 {
     std::cout << "ExpressFlow Stage 1" << '\n';

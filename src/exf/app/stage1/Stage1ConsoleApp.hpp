@@ -3,12 +3,12 @@
 namespace exf {
 
 /**
- * Stage1ConsoleApp owns the stage 1 console entry flow.
+ * Stage1ConsoleApp 管理阶段 1 的控制台入口流程。
  */
 class Stage1ConsoleApp {
 public:
     /**
-     * Runs the placeholder stage 1 console application.
+     * 运行阶段 1 的控制台占位程序。
      */
     int run() const;
 };

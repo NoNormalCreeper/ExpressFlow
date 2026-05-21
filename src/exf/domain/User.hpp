@@ -7,17 +7,17 @@
 namespace exf {
 
 /**
- * User stores the stage 1 account information required by the assignment.
+ * User 保存阶段 1 所需的用户账户信息。
  */
 class User {
 public:
     /**
-     * Creates an empty user object for repository placeholders.
+     * 为仓储占位创建空用户对象。
      */
     User();
 
     /**
-     * Creates a user with identity data and an initial balance.
+     * 用身份信息和初始余额创建用户。
      */
     User(std::string username,
          std::string name,
@@ -27,57 +27,57 @@ public:
          double initialBalance);
 
     /**
-     * Returns the unique username.
+     * 返回唯一用户名。
      */
     const std::string& username() const;
 
     /**
-     * Returns the user's real name.
+     * 返回用户真实姓名。
      */
     const std::string& name() const;
 
     /**
-     * Returns the user's phone number.
+     * 返回用户手机号。
      */
     const std::string& phone() const;
 
     /**
-     * Returns the password placeholder used by later authentication logic.
+     * 返回后续认证逻辑使用的密码占位值。
      */
     const std::string& password() const;
 
     /**
-     * Returns the user's address.
+     * 返回用户地址。
      */
     const std::string& address() const;
 
     /**
-     * Returns the user's account.
+     * 返回用户账户。
      */
     const Account& account() const;
 
     /**
-     * Replaces the user's password.
+     * 替换用户密码。
      */
     void setPassword(std::string password);
 
 private:
-    /** Unique platform username. */
+    /** 平台唯一用户名。 */
     std::string username_;
 
-    /** User's real name. */
+    /** 用户真实姓名。 */
     std::string name_;
 
-    /** User's phone number. */
+    /** 用户手机号。 */
     std::string phone_;
 
-    /** Password placeholder for stage 1 authentication. */
+    /** 阶段 1 认证用密码占位值。 */
     std::string password_;
 
-    /** User's delivery address. */
+    /** 用户收件地址。 */
     std::string address_;
 
-    /** User balance account. */
+    /** 用户余额账户。 */
     Account account_;
 };
 

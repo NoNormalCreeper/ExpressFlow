@@ -2,22 +2,22 @@
 
 namespace exf {
 
-// Stores the initial balance for a new account.
+// 保存新账户的初始余额。
 Account::Account(double initialBalance) : balance_(initialBalance) {}
 
-// Returns the account balance.
+// 返回账户余额。
 double Account::balance() const
 {
     return balance_;
 }
 
-// Checks whether the balance covers a positive payment amount.
+// 检查余额是否足够支付非负金额。
 bool Account::canAfford(double amount) const
 {
     return amount >= 0.0 && balance_ >= amount;
 }
 
-// Adds positive money to the balance.
+// 向余额增加正数金额。
 void Account::credit(double amount)
 {
     if (amount > 0.0) {
@@ -25,7 +25,7 @@ void Account::credit(double amount)
     }
 }
 
-// Subtracts positive money when the balance is sufficient.
+// 余额足够时扣除正数金额。
 bool Account::debit(double amount)
 {
     if (!canAfford(amount)) {

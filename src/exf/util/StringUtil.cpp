@@ -4,7 +4,7 @@
 
 namespace exf {
 
-// Removes leading and trailing whitespace from a string view.
+// 去掉 string_view 的首尾空白。
 std::string StringUtil::trim(std::string_view value)
 {
     std::size_t begin = 0;

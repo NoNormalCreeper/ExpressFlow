@@ -3,12 +3,12 @@
 namespace exf {
 
 /**
- * RecordCodec centralizes the text delimiter planned for file records.
+ * RecordCodec 统一保存文件记录使用的文本分隔符。
  */
 class RecordCodec {
 public:
     /**
-     * Returns the delimiter used by simple text records.
+     * 返回简单文本记录使用的分隔符。
      */
     static char delimiter();
 };

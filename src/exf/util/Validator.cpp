@@ -4,13 +4,13 @@
 
 namespace exf {
 
-// Checks that text remains after trimming whitespace.
+// 检查去掉空白后是否仍有内容。
 bool Validator::isNonEmpty(std::string_view value)
 {
     return !StringUtil::trim(value).empty();
 }
 
-// Checks that money-like values are positive.
+// 检查金额类数值是否为正数。
 bool Validator::isPositiveAmount(double amount)
 {
     return amount > 0.0;

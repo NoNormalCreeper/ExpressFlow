@@ -5,12 +5,12 @@
 namespace exf {
 
 /**
- * IdGenerator creates simple identifiers for future parcel records.
+ * IdGenerator 为后续包裹记录创建简单标识。
  */
 class IdGenerator {
 public:
     /**
-     * Returns a new parcel identifier.
+     * 返回新的包裹标识。
      */
     static std::string nextParcelId();
 };

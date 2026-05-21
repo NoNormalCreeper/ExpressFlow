@@ -3,17 +3,17 @@
 namespace exf {
 
 /**
- * AuthService will coordinate registration, login, and password changes.
+ * AuthService 负责后续注册、登录和改密流程。
  */
 class AuthService {
 public:
     /**
-     * Creates a service placeholder.
+     * 创建服务占位对象。
      */
     AuthService();
 
     /**
-     * Returns whether the service placeholder is usable.
+     * 返回服务占位对象是否可用。
      */
     bool isReady() const;
 };

@@ -3,13 +3,13 @@
 namespace exf {
 
 /**
- * ParcelStatus lists the two parcel states required by stage 1.
+ * ParcelStatus 列出阶段 1 需要的两种包裹状态。
  */
 enum class ParcelStatus {
-    /** The parcel is waiting for the receiver to sign. */
+    /** 等待收件人签收。 */
     WaitingForSign,
 
-    /** The parcel has been signed by the receiver. */
+    /** 收件人已签收。 */
     Signed
 };
 

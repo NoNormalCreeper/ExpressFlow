@@ -3,17 +3,17 @@
 namespace exf {
 
 /**
- * ParcelService will hold parcel sending, signing, and query workflows.
+ * ParcelService 负责后续寄件、签收和查询流程。
  */
 class ParcelService {
 public:
     /**
-     * Creates a service placeholder.
+     * 创建服务占位对象。
      */
     ParcelService();
 
     /**
-     * Returns the fixed stage 1 parcel price.
+     * 返回阶段 1 固定寄件价格。
      */
     double stage1ParcelPrice() const;
 };

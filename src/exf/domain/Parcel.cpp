@@ -4,10 +4,10 @@
 
 namespace exf {
 
-// Creates an empty parcel placeholder.
+// 创建空包裹占位对象。
 Parcel::Parcel() : status_(ParcelStatus::WaitingForSign) {}
 
-// Stores the stage 1 parcel data.
+// 保存阶段 1 的包裹数据。
 Parcel::Parcel(std::string id,
                std::string senderUsername,
                std::string receiverUsername,
@@ -23,49 +23,49 @@ Parcel::Parcel(std::string id,
 {
 }
 
-// Returns the parcel tracking number.
+// 返回包裹单号。
 const std::string& Parcel::id() const
 {
     return id_;
 }
 
-// Returns the sender username.
+// 返回寄件人用户名。
 const std::string& Parcel::senderUsername() const
 {
     return senderUsername_;
 }
 
-// Returns the receiver username.
+// 返回收件人用户名。
 const std::string& Parcel::receiverUsername() const
 {
     return receiverUsername_;
 }
 
-// Returns the parcel description.
+// 返回包裹描述。
 const std::string& Parcel::description() const
 {
     return description_;
 }
 
-// Returns the sending time.
+// 返回寄件时间。
 const std::string& Parcel::sentAt() const
 {
     return sentAt_;
 }
 
-// Returns the receiving time.
+// 返回签收时间。
 const std::string& Parcel::receivedAt() const
 {
     return receivedAt_;
 }
 
-// Returns the parcel status.
+// 返回包裹状态。
 ParcelStatus Parcel::status() const
 {
     return status_;
 }
 
-// Marks the parcel as signed and stores the receiving time.
+// 将包裹标记为已签收，并保存签收时间。
 void Parcel::markSigned(std::string receivedAt)
 {
     receivedAt_ = std::move(receivedAt);

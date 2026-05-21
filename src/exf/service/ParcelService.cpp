@@ -2,10 +2,10 @@
 
 namespace exf {
 
-// Creates the parcel service placeholder.
+// 创建包裹服务占位对象。
 ParcelService::ParcelService() = default;
 
-// Returns the fixed price required by stage 1.
+// 返回阶段 1 要求的固定价格。
 double ParcelService::stage1ParcelPrice() const
 {
     return 15.0;

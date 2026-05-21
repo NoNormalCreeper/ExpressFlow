@@ -7,17 +7,17 @@
 namespace exf {
 
 /**
- * Parcel stores the stage 1 delivery record owned by sender and receiver users.
+ * Parcel 保存阶段 1 中寄件人和收件人的包裹记录。
  */
 class Parcel {
 public:
     /**
-     * Creates an empty parcel for repository placeholders.
+     * 为仓储占位创建空包裹。
      */
     Parcel();
 
     /**
-     * Creates a parcel record in the given status.
+     * 用指定状态创建包裹记录。
      */
     Parcel(std::string id,
            std::string senderUsername,
@@ -27,65 +27,65 @@ public:
            ParcelStatus status);
 
     /**
-     * Returns the parcel tracking number.
+     * 返回包裹单号。
      */
     const std::string& id() const;
 
     /**
-     * Returns the sending user's username.
+     * 返回寄件用户的用户名。
      */
     const std::string& senderUsername() const;
 
     /**
-     * Returns the receiving user's username.
+     * 返回收件用户的用户名。
      */
     const std::string& receiverUsername() const;
 
     /**
-     * Returns the parcel description.
+     * 返回包裹描述。
      */
     const std::string& description() const;
 
     /**
-     * Returns the sending time string.
+     * 返回寄件时间字符串。
      */
     const std::string& sentAt() const;
 
     /**
-     * Returns the receiving time string.
+     * 返回签收时间字符串。
      */
     const std::string& receivedAt() const;
 
     /**
-     * Returns the current parcel status.
+     * 返回当前包裹状态。
      */
     ParcelStatus status() const;
 
     /**
-     * Marks the parcel as signed at the given receiving time.
+     * 按指定签收时间将包裹标记为已签收。
      */
     void markSigned(std::string receivedAt);
 
 private:
-    /** Parcel tracking number. */
+    /** 包裹单号。 */
     std::string id_;
 
-    /** Username of the sender. */
+    /** 寄件人用户名。 */
     std::string senderUsername_;
 
-    /** Username of the receiver. */
+    /** 收件人用户名。 */
     std::string receiverUsername_;
 
-    /** User-provided parcel description. */
+    /** 用户填写的包裹描述。 */
     std::string description_;
 
-    /** Time when the parcel was submitted. */
+    /** 包裹提交时间。 */
     std::string sentAt_;
 
-    /** Time when the receiver signed the parcel. */
+    /** 收件人签收时间。 */
     std::string receivedAt_;
 
-    /** Stage 1 parcel status. */
+    /** 阶段 1 包裹状态。 */
     ParcelStatus status_;
 };
 

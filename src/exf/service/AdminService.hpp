@@ -3,17 +3,17 @@
 namespace exf {
 
 /**
- * AdminService will hold administrator business operations for stage 1.
+ * AdminService 负责阶段 1 的管理员业务操作。
  */
 class AdminService {
 public:
     /**
-     * Creates a service placeholder.
+     * 创建服务占位对象。
      */
     AdminService();
 
     /**
-     * Returns whether the service placeholder is usable.
+     * 返回服务占位对象是否可用。
      */
     bool isReady() const;
 };

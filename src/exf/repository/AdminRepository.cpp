@@ -2,10 +2,10 @@
 
 namespace exf {
 
-// Creates the administrator repository placeholder.
+// 创建管理员仓储占位对象。
 AdminRepository::AdminRepository() = default;
 
-// Reports that the placeholder is constructible.
+// 表示占位对象可构造。
 bool AdminRepository::isReady() const
 {
     return true;

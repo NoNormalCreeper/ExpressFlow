@@ -5,7 +5,7 @@
 
 namespace exf {
 
-// Creates a process-local parcel identifier.
+// 创建进程内唯一的包裹标识。
 std::string IdGenerator::nextParcelId()
 {
     static std::atomic<unsigned long> counter{0};

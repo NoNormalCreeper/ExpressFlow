@@ -2,10 +2,10 @@
 
 namespace exf {
 
-// Creates the parcel repository placeholder.
+// 创建包裹仓储占位对象。
 ParcelRepository::ParcelRepository() = default;
 
-// Reports that the placeholder is constructible.
+// 表示占位对象可构造。
 bool ParcelRepository::isReady() const
 {
     return true;

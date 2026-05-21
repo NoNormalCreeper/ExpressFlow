@@ -4,10 +4,10 @@
 
 namespace exf {
 
-// Creates an empty administrator placeholder.
+// 创建空管理员占位对象。
 Admin::Admin() : account_(0.0) {}
 
-// Stores administrator identity data and balance.
+// 保存管理员身份信息和余额。
 Admin::Admin(std::string username, std::string name, std::string password, double initialBalance)
     : username_(std::move(username)),
       name_(std::move(name)),
@@ -16,25 +16,25 @@ Admin::Admin(std::string username, std::string name, std::string password, doubl
 {
 }
 
-// Returns the unique administrator username.
+// 返回唯一管理员用户名。
 const std::string& Admin::username() const
 {
     return username_;
 }
 
-// Returns the administrator display name.
+// 返回管理员显示名。
 const std::string& Admin::name() const
 {
     return name_;
 }
 
-// Returns the administrator password placeholder.
+// 返回管理员密码占位值。
 const std::string& Admin::password() const
 {
     return password_;
 }
 
-// Returns the administrator account.
+// 返回管理员账户。
 const Account& Admin::account() const
 {
     return account_;

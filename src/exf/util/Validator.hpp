@@ -5,17 +5,17 @@
 namespace exf {
 
 /**
- * Validator contains simple input validation helpers for service code.
+ * Validator 提供服务层使用的简单输入校验工具。
  */
 class Validator {
 public:
     /**
-     * Returns whether the value has non-whitespace content.
+     * 判断值是否包含非空白内容。
      */
     static bool isNonEmpty(std::string_view value);
 
     /**
-     * Returns whether an amount is positive.
+     * 判断金额是否为正数。
      */
     static bool isPositiveAmount(double amount);
 };

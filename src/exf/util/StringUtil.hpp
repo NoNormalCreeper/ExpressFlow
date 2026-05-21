@@ -6,12 +6,12 @@
 namespace exf {
 
 /**
- * StringUtil contains small string helpers used across the core layer.
+ * StringUtil 提供核心层通用的小型字符串工具。
  */
 class StringUtil {
 public:
     /**
-     * Returns a copy of the input without leading or trailing whitespace.
+     * 返回去掉首尾空白后的输入副本。
      */
     static std::string trim(std::string_view value);
 };

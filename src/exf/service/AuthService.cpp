@@ -2,10 +2,10 @@
 
 namespace exf {
 
-// Creates the authentication service placeholder.
+// 创建认证服务占位对象。
 AuthService::AuthService() = default;
 
-// Reports that the placeholder is constructible.
+// 表示占位对象可构造。
 bool AuthService::isReady() const
 {
     return true;

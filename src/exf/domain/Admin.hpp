@@ -7,51 +7,51 @@
 namespace exf {
 
 /**
- * Admin represents the logistics company administrator for stage 1.
+ * Admin 表示阶段 1 的物流公司管理员。
  */
 class Admin {
 public:
     /**
-     * Creates an empty administrator object for repository placeholders.
+     * 为仓储占位创建空管理员对象。
      */
     Admin();
 
     /**
-     * Creates an administrator with identity data and an initial balance.
+     * 用身份信息和初始余额创建管理员。
      */
     Admin(std::string username, std::string name, std::string password, double initialBalance);
 
     /**
-     * Returns the unique administrator username.
+     * 返回唯一管理员用户名。
      */
     const std::string& username() const;
 
     /**
-     * Returns the administrator display name.
+     * 返回管理员显示名。
      */
     const std::string& name() const;
 
     /**
-     * Returns the administrator password placeholder.
+     * 返回管理员密码占位值。
      */
     const std::string& password() const;
 
     /**
-     * Returns the administrator account.
+     * 返回管理员账户。
      */
     const Account& account() const;
 
 private:
-    /** Unique administrator username. */
+    /** 唯一管理员用户名。 */
     std::string username_;
 
-    /** Administrator display name. */
+    /** 管理员显示名。 */
     std::string name_;
 
-    /** Password placeholder for later authentication work. */
+    /** 后续认证用密码占位值。 */
     std::string password_;
 
-    /** Account that receives freight charges in stage 1. */
+    /** 阶段 1 接收运费的账户。 */
     Account account_;
 };
 

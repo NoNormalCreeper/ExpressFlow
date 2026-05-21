@@ -3,17 +3,17 @@
 namespace exf {
 
 /**
- * UserRepository is the stage 1 placeholder for user persistence.
+ * UserRepository 是阶段 1 的用户持久化占位类。
  */
 class UserRepository {
 public:
     /**
-     * Creates a repository placeholder.
+     * 创建仓储占位对象。
      */
     UserRepository();
 
     /**
-     * Returns whether the repository placeholder is usable.
+     * 返回仓储占位对象是否可用。
      */
     bool isReady() const;
 };

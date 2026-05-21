@@ -5,12 +5,12 @@
 namespace exf {
 
 /**
- * TimeUtil centralizes simple time formatting for domain records.
+ * TimeUtil 统一处理领域记录的简单时间格式。
  */
 class TimeUtil {
 public:
     /**
-     * Returns the current time as a simple timestamp string.
+     * 返回当前时间的简单时间戳字符串。
      */
     static std::string nowString();
 };

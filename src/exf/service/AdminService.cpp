@@ -2,10 +2,10 @@
 
 namespace exf {
 
-// Creates the administrator service placeholder.
+// 创建管理员服务占位对象。
 AdminService::AdminService() = default;
 
-// Reports that the placeholder is constructible.
+// 表示占位对象可构造。
 bool AdminService::isReady() const
 {
     return true;

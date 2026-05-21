@@ -5,7 +5,7 @@
 
 namespace exf {
 
-// Returns seconds since epoch as a stable timestamp string.
+// 返回纪元以来的秒数，作为稳定时间戳字符串。
 std::string TimeUtil::nowString()
 {
     const auto now = std::chrono::system_clock::now();

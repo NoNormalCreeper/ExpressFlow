@@ -3,37 +3,37 @@
 namespace exf {
 
 /**
- * Account stores a simple money balance for a platform user or administrator.
+ * Account 保存用户或管理员的简单余额。
  */
 class Account {
 public:
     /**
-     * Creates an account with the given initial balance.
+     * 用指定初始余额创建账户。
      */
     explicit Account(double initialBalance = 0.0);
 
     /**
-     * Returns the current balance without changing the account.
+     * 返回当前余额，不修改账户。
      */
     double balance() const;
 
     /**
-     * Returns whether the account can pay the requested amount.
+     * 判断账户能否支付指定金额。
      */
     bool canAfford(double amount) const;
 
     /**
-     * Adds a positive amount to the account balance.
+     * 向余额增加正数金额。
      */
     void credit(double amount);
 
     /**
-     * Tries to subtract a positive amount from the account balance.
+     * 尝试从余额扣除正数金额。
      */
     bool debit(double amount);
 
 private:
-    /** Current account balance. */
+    /** 当前账户余额。 */
     double balance_;
 };
 

@@ -4,10 +4,10 @@
 
 namespace exf {
 
-// Creates an empty user placeholder.
+// 创建空用户占位对象。
 User::User() : account_(0.0) {}
 
-// Stores user identity data and balance.
+// 保存用户身份信息和余额。
 User::User(std::string username,
            std::string name,
            std::string phone,
@@ -23,43 +23,43 @@ User::User(std::string username,
 {
 }
 
-// Returns the unique username.
+// 返回唯一用户名。
 const std::string& User::username() const
 {
     return username_;
 }
 
-// Returns the user's real name.
+// 返回用户真实姓名。
 const std::string& User::name() const
 {
     return name_;
 }
 
-// Returns the phone number.
+// 返回手机号。
 const std::string& User::phone() const
 {
     return phone_;
 }
 
-// Returns the password placeholder.
+// 返回密码占位值。
 const std::string& User::password() const
 {
     return password_;
 }
 
-// Returns the delivery address.
+// 返回收件地址。
 const std::string& User::address() const
 {
     return address_;
 }
 
-// Returns the user account.
+// 返回用户账户。
 const Account& User::account() const
 {
     return account_;
 }
 
-// Replaces the stored password.
+// 替换已保存的密码。
 void User::setPassword(std::string password)
 {
     password_ = std::move(password);

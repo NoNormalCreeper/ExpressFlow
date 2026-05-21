@@ -5,27 +5,27 @@
 namespace exf {
 
 /**
- * FileStorage stores the base directory planned for text-file persistence.
+ * FileStorage 保存文本文件持久化要使用的根目录。
  */
 class FileStorage {
 public:
     /**
-     * Creates storage rooted at the current directory.
+     * 用当前目录作为根目录创建存储对象。
      */
     FileStorage();
 
     /**
-     * Creates storage rooted at the given base path.
+     * 用指定路径作为根目录创建存储对象。
      */
     explicit FileStorage(std::filesystem::path basePath);
 
     /**
-     * Returns the configured base path.
+     * 返回已配置的根路径。
      */
     const std::filesystem::path& basePath() const;
 
 private:
-    /** Base directory for future data files. */
+    /** 后续数据文件的根目录。 */
     std::filesystem::path basePath_;
 };
 

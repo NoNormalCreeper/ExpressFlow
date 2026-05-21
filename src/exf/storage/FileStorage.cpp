@@ -4,13 +4,13 @@
 
 namespace exf {
 
-// Uses the current directory as the default storage root.
+// 默认使用当前目录作为存储根目录。
 FileStorage::FileStorage() : basePath_(".") {}
 
-// Stores the selected storage root.
+// 保存选定的存储根目录。
 FileStorage::FileStorage(std::filesystem::path basePath) : basePath_(std::move(basePath)) {}
 
-// Returns the selected storage root.
+// 返回选定的存储根目录。
 const std::filesystem::path& FileStorage::basePath() const
 {
     return basePath_;
