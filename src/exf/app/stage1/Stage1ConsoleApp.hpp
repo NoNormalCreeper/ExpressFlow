@@ -1,11 +1,14 @@
 #pragma once
 
+#include "ConsoleInput.hpp"
+#include "ConsoleMenu.hpp"
 #include "exf/repository/UserRepository.hpp"
 #include "exf/service/AuthService.hpp"
 #include "exf/service/ParcelService.hpp"
 #include "exf/service/UserService.hpp"
 #include "exf/storage/FileStorage.hpp"
 #include "exf/storage/RecordCodec.hpp"
+
 namespace exf {
 
 /**
@@ -13,7 +16,6 @@ namespace exf {
  */
 class Stage1ConsoleApp {
    public:
-
     /**
      * 创建阶段 1 的控制台占位程序。
      */
@@ -22,7 +24,7 @@ class Stage1ConsoleApp {
     /**
      * 运行阶段 1 的控制台占位程序。
      */
-    int run() const;
+    int run();
 
    private:
     // 注入依赖
@@ -32,6 +34,10 @@ class Stage1ConsoleApp {
 
     AuthService authService_;
     UserService userService_;
+
+    void handleUserRegister();
+    void handleUserLogin();
+    void handleChangePassword();
 };
 
 }  // namespace exf

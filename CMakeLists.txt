@@ -34,6 +34,8 @@ target_compile_features(core PUBLIC cxx_std_20)
 add_executable(stage1
     apps/stage1/main.cpp
     src/exf/app/stage1/Stage1ConsoleApp.cpp
+    src/exf/app/stage1/ConsoleInput.cpp
+    src/exf/app/stage1/ConsoleMenu.cpp
 )
 
 target_link_libraries(stage1 PRIVATE core)
