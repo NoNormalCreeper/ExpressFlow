@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.20)
 
 project(ExpressFlow LANGUAGES CXX)
 
+include(FetchContent)
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -42,10 +44,36 @@ add_custom_target(run
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
 
+find_package(GTest CONFIG QUIET)
+if(NOT GTest_FOUND)
+    find_package(GTest QUIET)
+endif()
+
+if(NOT GTest_FOUND)
+    FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    )
+    FetchContent_MakeAvailable(googletest)
+endif()
+
+if(TARGET GTest::gtest_main)
+    set(EXPRESSFLOW_GTEST_MAIN GTest::gtest_main)
+elseif(TARGET gtest_main)
+    set(EXPRESSFLOW_GTEST_MAIN gtest_main)
+else()
+    message(FATAL_ERROR "GoogleTest was not found and could not be made available")
+endif()
+
 add_executable(unit_tests
-    tests/test_smoke.cpp
+    tests/domain/AccountTest.cpp
+    tests/storage/FileStorageTest.cpp
+    tests/storage/RecordCodecTest.cpp
+    tests/storage/UserRecordCodecTest.cpp
 )
-target_link_libraries(unit_tests PRIVATE core)
+target_link_libraries(unit_tests PRIVATE core ${EXPRESSFLOW_GTEST_MAIN})
 
 enable_testing()
-add_test(NAME unit_tests COMMAND unit_tests)
+include(GoogleTest)
+gtest_discover_tests(unit_tests)
