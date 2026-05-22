@@ -47,6 +47,10 @@ const std::string& User::address() const {
 }
 
 // 返回用户账户。
+Account& User::account() {
+    return account_;
+}
+
 const Account& User::account() const {
     return account_;
 }

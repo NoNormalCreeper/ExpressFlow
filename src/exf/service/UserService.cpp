@@ -60,5 +60,41 @@ UserServiceError UserService::updatePassword(const std::string& username,
 
     return UserServiceError::Nil;
 }
+util::Money UserService::getBalance(const std::string_view username) const {
+    auto user = users_.findUser(username);
+    return user->account().balance();
+}
+
+UserAccountError UserService::topUpBalance(const std::string_view username,
+                                           const util::Money& amount) {
+    // 走 copy-modify-update，不直接修改 repo 内部对象
+    auto user = users_.findUser(username);
+    if (user == nullptr) {
+        return UserAccountError::UserNotFound;
+    }
+
+    auto updated = *user;
+    updated.account().credit(amount);
+    users_.updateUser(username, updated);
+
+    return UserAccountError::Nil;
+}
+
+UserAccountError UserService::payFromBalance(const std::string_view username,
+                                             const util::Money& amount) {
+    auto user = users_.findUser(username);
+    if (user == nullptr) {
+        return UserAccountError::UserNotFound;
+    }
+
+    auto updated = *user;
+
+    if (!updated.account().debit(amount)) {
+        return UserAccountError::InsufficientBalance;
+    }
+    users_.updateUser(username, updated);
+
+    return UserAccountError::Nil;
+}
 
 }  // namespace exf

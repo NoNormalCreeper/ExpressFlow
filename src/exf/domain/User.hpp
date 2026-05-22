@@ -55,6 +55,7 @@ class User {
     /**
      * 返回用户账户。
      */
+    Account& account();
     const Account& account() const;
 
     /**
