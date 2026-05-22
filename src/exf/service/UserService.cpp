@@ -62,11 +62,19 @@ UserServiceError UserService::updatePassword(const std::string& username,
 }
 util::Money UserService::getBalance(const std::string_view username) const {
     auto user = users_.findUser(username);
+    if (user == nullptr) {
+        throw std::runtime_error("用户未找到，不符合约定，请检查调用");
+    }
+
     return user->account().balance();
 }
 
 UserAccountError UserService::topUpBalance(const std::string_view username,
                                            const util::Money& amount) {
+    if (amount < util::Money(0)) {
+        return UserAccountError::InvalidAmount;
+    }
+
     // 走 copy-modify-update，不直接修改 repo 内部对象
     auto user = users_.findUser(username);
     if (user == nullptr) {
@@ -82,6 +90,10 @@ UserAccountError UserService::topUpBalance(const std::string_view username,
 
 UserAccountError UserService::payFromBalance(const std::string_view username,
                                              const util::Money& amount) {
+    if (amount < util::Money(0)) {
+        return UserAccountError::InvalidAmount;
+    }
+
     auto user = users_.findUser(username);
     if (user == nullptr) {
         return UserAccountError::UserNotFound;

@@ -18,6 +18,7 @@ enum class UserAccountError {
     Nil,
     UserNotFound,
     InsufficientBalance,
+    InvalidAmount
 };
 
 /**
