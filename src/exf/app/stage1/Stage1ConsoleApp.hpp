@@ -36,8 +36,8 @@ class Stage1ConsoleApp {
     UserService userService_;
 
     void handleUserRegister();
-    void handleUserLogin();
-    void handleChangePassword();
+    void handleUserLogin(MainMenu::Context& ctx);
+    void handleChangePassword(MainMenu::Context& ctx);
 };
 
 }  // namespace exf

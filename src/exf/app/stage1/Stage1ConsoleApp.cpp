@@ -27,7 +27,7 @@ void Stage1ConsoleApp::handleUserRegister() {
         ConsoleInput::promptRegex("请输入手机号", std::regex(R"(1\d{10})"),
                                   "请输入有效的手机号（11位数字，以1开头）。");
     password = ConsoleInput::promptRegex("请输入密码（至少6位）",
-                                         std::regex(R"(.{6,})"),
+                                         ConsoleInput::passwordRegex,
                                          "密码至少需要6位，请重新输入。");
     address = ConsoleInput::promptNonEmpty("请输入地址");
     util::Money initialBalance;
@@ -48,12 +48,99 @@ void Stage1ConsoleApp::handleUserRegister() {
     }
 }
 
-void Stage1ConsoleApp::handleUserLogin() {
-    // 实现用户登录逻辑
+void Stage1ConsoleApp::handleUserLogin(MainMenu::Context& ctx) {
+    std::string username, password;
+
+    while (true) {
+        username = ConsoleInput::promptNonEmpty("请输入用户名");
+        if (userRepository_.userExists(username)) {
+            break;
+        }
+        std::cout << "用户名不存在，请重新输入。\n";
+    }
+
+    password =
+        ConsoleInput::promptRegex("请输入密码", ConsoleInput::passwordRegex,
+                                  "密码至少需要6位，请重新输入。");
+
+    auto err = userService_.loginUser(username, password);
+    switch (err) {
+        case UserServiceError::Nil:
+            ctx.loggedIn = 1;
+            ctx.username = username;
+            std::cout << "登录成功！\n";
+            break;
+
+        case UserServiceError::UserNotFound:
+            std::cout << "用户不存在。\n";
+            break;
+        case UserServiceError::IncorrectPassword:
+            std::cout << "密码错误。\n";
+            break;
+    }
 }
 
-void Stage1ConsoleApp::handleChangePassword() {
-    // 实现修改密码逻辑
+void Stage1ConsoleApp::handleChangePassword(MainMenu::Context& ctx) {
+    if (ctx.loggedIn == 0) {
+        std::cout << "尚未登录。\n";
+        return;
+    }
+
+    std::string username, originalPassword, newPassword;
+
+    // while (true) {
+    //     username = ConsoleInput::promptNonEmpty("请输入用户名");
+    //     if (userRepository_.userExists(username)) {
+    //         break;
+    //     }
+    //     std::cout << "用户名不存在，请重新输入。\n";
+    // }
+
+    username = ctx.username;
+
+    originalPassword =
+        ConsoleInput::promptRegex("请输入密码", ConsoleInput::passwordRegex,
+                                  "密码至少需要6位，请重新输入。");
+
+    auto err = userService_.loginUser(username, originalPassword);
+    switch (err) {
+        case UserServiceError::Nil: {
+            ctx.loggedIn = 1;
+            ctx.username = username;
+            std::cout << "密码验证通过。\n";
+
+            while (true) {
+                newPassword = ConsoleInput::promptRegex(
+                    "请输入新密码", ConsoleInput::passwordRegex,
+                    "密码至少需要6位，请重新输入。");
+
+                auto confirmPassword = ConsoleInput::promptNonEmpty("请再次输入新密码以确认");
+
+                if (confirmPassword == newPassword) {
+                    break;
+                }
+
+                std::cout << "两次输入的密码不匹配，请重新输入。\n";
+            }
+
+            auto err = userService_.updatePassword(username, originalPassword, newPassword);
+
+            if (err == UserServiceError::Nil) {
+                std::cout << "密码修改成功。\n";
+            } else {
+                std::cout << "密码修改失败。\n";   // 不应该走到此分支
+            }
+
+            break;
+        }
+
+        case UserServiceError::UserNotFound:
+            std::cout << "用户不存在。\n";
+            break;
+        case UserServiceError::IncorrectPassword:
+            std::cout << "原密码错误。\n";
+            break;
+    }
 }
 
 // 打印阶段 1 的占位菜单。
@@ -73,10 +160,10 @@ int Stage1ConsoleApp::run() {
                         handleUserRegister();
                         break;
                     case 2:
-                        handleUserLogin();
+                        handleUserLogin(ctx);
                         break;
                     case 3:
-                        handleChangePassword();
+                        handleChangePassword(ctx);
                         break;
                     case 4:
                         // 返回主菜单

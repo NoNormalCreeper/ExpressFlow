@@ -32,6 +32,8 @@ util::Money ConsoleInput::promptNonNegativeMoney(std::string_view label) {
     }
 }
 
+const std::regex exf::ConsoleInput::passwordRegex{R"(.{6,})"};
+
 std::string ConsoleInput::promptRegex(std::string_view label,
                                       const std::regex& pattern,
                                       std::string_view errorMessage) {

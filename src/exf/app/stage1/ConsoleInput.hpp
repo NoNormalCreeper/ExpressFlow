@@ -19,6 +19,8 @@ class ConsoleInput {
         const std::function<bool(const std::string&)>& validator,
         std::string_view errorMessage = "输入不合法");
     static int promptChoice(std::string_view label, int min, int max);
+
+    static const std::regex passwordRegex;
 };
 
 }  // namespace exf
