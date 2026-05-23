@@ -38,6 +38,10 @@ class Stage1ConsoleApp {
     void handleUserRegister();
     void handleUserLogin(MainMenu::Context& ctx);
     void handleChangePassword(MainMenu::Context& ctx);
+
+    // 约定登录后调用
+    void handleGetBalance(MainMenu::Context& ctx);
+    void handleTopUpBalance(MainMenu::Context& ctx);
 };
 
 }  // namespace exf

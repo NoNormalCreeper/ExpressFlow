@@ -114,7 +114,8 @@ void Stage1ConsoleApp::handleChangePassword(MainMenu::Context& ctx) {
                     "请输入新密码", ConsoleInput::passwordRegex,
                     "密码至少需要6位，请重新输入。");
 
-                auto confirmPassword = ConsoleInput::promptNonEmpty("请再次输入新密码以确认");
+                auto confirmPassword =
+                    ConsoleInput::promptNonEmpty("请再次输入新密码以确认");
 
                 if (confirmPassword == newPassword) {
                     break;
@@ -123,12 +124,13 @@ void Stage1ConsoleApp::handleChangePassword(MainMenu::Context& ctx) {
                 std::cout << "两次输入的密码不匹配，请重新输入。\n";
             }
 
-            auto err = userService_.updatePassword(username, originalPassword, newPassword);
+            auto err = userService_.updatePassword(username, originalPassword,
+                                                   newPassword);
 
             if (err == UserServiceError::Nil) {
                 std::cout << "密码修改成功。\n";
             } else {
-                std::cout << "密码修改失败。\n";   // 不应该走到此分支
+                std::cout << "密码修改失败。\n";  // 不应该走到此分支
             }
 
             break;
@@ -140,6 +142,29 @@ void Stage1ConsoleApp::handleChangePassword(MainMenu::Context& ctx) {
         case UserServiceError::IncorrectPassword:
             std::cout << "原密码错误。\n";
             break;
+    }
+}
+
+void Stage1ConsoleApp::handleGetBalance(MainMenu::Context& ctx) {
+    std::cout << "当前余额: " << userService_.getBalance(ctx.username)
+              << " 元。\n";
+}
+
+void Stage1ConsoleApp::handleTopUpBalance(MainMenu::Context& ctx) {
+    std::cout << "当前余额: " << userService_.getBalance(ctx.username)
+              << " 元。\n";
+
+    auto amount = ConsoleInput::promptNonNegativeMoney("输入需要充值的金额");
+    auto err = userService_.topUpBalance(ctx.username, amount);
+    switch (err) {
+        case UserAccountError::Nil:
+            std::cout << "充值成功！当前余额: "
+                      << userService_.getBalance(ctx.username) << " 元。\n";
+            break;
+        case UserAccountError::UserNotFound:
+            std::cout << "用户不存在。\n";
+        case UserAccountError::InvalidAmount:
+            std::cout << "金额有误。\n";
     }
 }
 
@@ -165,10 +190,24 @@ int Stage1ConsoleApp::run() {
                     case 3:
                         handleChangePassword(ctx);
                         break;
-                    case 4:
+                    default:
                         // 返回主菜单
                         break;
                 }
+                break;
+            }
+            case 2: {
+                int userChoice = ConsoleMenu::showAccountMenu(ctx);
+                switch (userChoice) {
+                    case 1:
+                        handleGetBalance(ctx);
+                        break;
+                    case 2:
+                        handleTopUpBalance(ctx);
+                    default:
+                        break;
+                }
+                break;
             }
         }
     }

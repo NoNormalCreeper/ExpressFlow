@@ -22,9 +22,12 @@ class ConsoleMenu {
     static void printSeparator(const std::string_view separator = "-",
                                int length = 20);
 
+    static void printLoginStatus(MainMenu::Context& ctx);
+
    public:
     static int showMainMenu(MainMenu::Context& ctx);
     static int showUserMenu(MainMenu::Context& ctx);
+    static int showAccountMenu(MainMenu::Context& ctx);
 };
 
 }  // namespace exf

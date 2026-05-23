@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstdint>
+#include <ostream>
+#include <sstream>
 #include <string>
 
 namespace exf::util {
@@ -91,7 +93,15 @@ class Money {
 };
 
 inline std::string to_string(const Money& money) {
-    return std::to_string(money.to_double());
+    std::ostringstream oss;
+    oss.setf(std::ios::fixed, std::ios::floatfield);
+    oss.precision(2);
+    oss << money.to_double();
+    return oss.str();
+}
+
+inline std::ostream& operator<<(std::ostream& os, const Money& money) {
+    return os << to_string(money);
 }
 
 }  // namespace exf::util
