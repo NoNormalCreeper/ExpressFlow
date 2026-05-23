@@ -9,6 +9,17 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+option(EXPRESSFLOW_USE_LIBCXX "Build with LLVM libc++ when using Clang" OFF)
+
+if(EXPRESSFLOW_USE_LIBCXX)
+    if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        message(FATAL_ERROR "EXPRESSFLOW_USE_LIBCXX requires a Clang compiler")
+    endif()
+
+    add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-stdlib=libc++>)
+    add_link_options(-stdlib=libc++)
+endif()
+
 add_library(core STATIC
     src/exf/domain/Account.cpp
     src/exf/domain/Admin.cpp
@@ -46,18 +57,33 @@ add_custom_target(run
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-find_package(GTest CONFIG QUIET)
-if(NOT GTest_FOUND)
-    find_package(GTest QUIET)
+set(EXPRESSFLOW_USE_SYSTEM_GTEST ON)
+if(EXPRESSFLOW_USE_LIBCXX)
+    set(EXPRESSFLOW_USE_SYSTEM_GTEST OFF)
 endif()
 
-if(NOT GTest_FOUND)
-    FetchContent_Declare(
-        googletest
-        URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
-        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-    )
-    FetchContent_MakeAvailable(googletest)
+if(EXPRESSFLOW_USE_SYSTEM_GTEST)
+    find_package(GTest CONFIG QUIET)
+    if(NOT GTest_FOUND)
+        find_package(GTest QUIET)
+    endif()
+endif()
+
+if(NOT EXPRESSFLOW_USE_SYSTEM_GTEST OR NOT GTest_FOUND)
+    if(EXISTS "/usr/src/googletest/CMakeLists.txt")
+        add_subdirectory(
+            /usr/src/googletest
+            ${CMAKE_CURRENT_BINARY_DIR}/_deps/system-googletest-build
+            EXCLUDE_FROM_ALL
+        )
+    else()
+        FetchContent_Declare(
+            googletest
+            URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+            DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+        )
+        FetchContent_MakeAvailable(googletest)
+    endif()
 endif()
 
 if(TARGET GTest::gtest_main)
@@ -75,6 +101,7 @@ add_executable(unit_tests
     tests/storage/FileStorageTest.cpp
     tests/storage/RecordCodecTest.cpp
     tests/storage/UserRecordCodecTest.cpp
+    tests/util/TimeUtilTest.cpp
 )
 target_link_libraries(unit_tests PRIVATE core ${EXPRESSFLOW_GTEST_MAIN})
 

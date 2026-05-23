@@ -1,7 +1,9 @@
 #include "exf/util/IdGenerator.hpp"
+#include "TimeUtil.hpp"
 
 #include <atomic>
 #include <string>
+#include <format>
 
 namespace exf {
 
@@ -9,7 +11,11 @@ namespace exf {
 std::string IdGenerator::nextParcelId() {
     static std::atomic<unsigned long> counter{0};
     const unsigned long value = ++counter;
-    return "P" + std::to_string(value);
+    return std::to_string(value);
+}
+
+std::string IdGenerator::newParcelId() {
+    return std::format("P{}-{}", TimeUtil::nowMillisecondString(), nextParcelId());
 }
 
 }  // namespace exf

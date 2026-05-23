@@ -1,6 +1,8 @@
 #pragma once
 
 #include <string>
+#include <string_view>
+#include <chrono>
 
 namespace exf {
 
@@ -13,6 +15,14 @@ class TimeUtil {
      * 返回当前时间的简单时间戳字符串。
      */
     static std::string nowString();
+    static std::string nowMillisecondString();
+    static std::string nowReadableString();
+    static std::string formatTimestamp(std::string_view timestamp);
+
+private:
+    static std::string formatTimePoint(const std::chrono::system_clock::time_point& tp);
+    static std::chrono::system_clock::time_point parseTimestamp(std::string_view timestamp);
+
 };
 
 }  // namespace exf

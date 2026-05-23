@@ -13,6 +13,9 @@ class IdGenerator {
      * 返回新的包裹标识。
      */
     static std::string nextParcelId();
+
+    // 毫秒时间戳+进程内自增 ID
+    static std::string newParcelId();
 };
 
 }  // namespace exf
