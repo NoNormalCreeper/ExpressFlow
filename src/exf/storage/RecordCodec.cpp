@@ -93,4 +93,29 @@ User UserRecordCodec::decode(const std::string_view line) {
     );
 }
 
+std::string ParcelRecordCodec::encode(const Parcel& parcel) {
+    std::vector<std::string> fields = {
+        parcel.id(),                                       // 包裹单号
+        parcel.senderUsername(),                           // 寄件人用户名
+        parcel.receiverUsername(),                         // 收件人用户名
+        parcel.description(),                              // 包裹描述
+        parcel.sentAt(),                                   // 寄件时间
+        parcel.receivedAt(),                               // 签收时间
+        exf::util::to_string(parcel.fee()),                // 运费
+        std::to_string(static_cast<int>(parcel.status()))  // 包裹状态
+    };
+    return join(fields);
+}
+
+Parcel ParcelRecordCodec::decode(std::string_view line) {
+    const auto fields = split(line);
+    if (fields.size() != 8) {
+        throw std::runtime_error("Invalid parcel record: " + std::string(line));
+    }
+
+    return Parcel(fields[0], fields[1], fields[2], fields[3], fields[4],
+                  fields[5], util::Money::from_string(fields[6]),
+                  static_cast<ParcelStatus>(std::stoi(fields[7])));
+}
+
 }  // namespace exf

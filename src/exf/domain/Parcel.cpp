@@ -13,13 +13,33 @@ Parcel::Parcel(std::string id,
                std::string receiverUsername,
                std::string description,
                std::string sentAt,
+               std::string receivedAt,
+               util::Money fee,
                ParcelStatus status)
     : id_(std::move(id)),
       senderUsername_(std::move(senderUsername)),
       receiverUsername_(std::move(receiverUsername)),
       description_(std::move(description)),
       sentAt_(std::move(sentAt)),
+      receivedAt_(std::move(receivedAt)),
+      fee_(std::move(fee)),
       status_(status) {}
+
+Parcel Parcel::createNew(std::string id,
+                         std::string senderUsername,
+                         std::string receiverUsername,
+                         std::string description,
+                         std::string sentAt,
+                         util::Money fee) {
+    return {std::move(id),
+            std::move(senderUsername),
+            std::move(receiverUsername),
+            std::move(description),
+            std::move(sentAt),
+            "",
+            std::move(fee),
+            ParcelStatus::WaitingForSign};
+}
 
 // 返回包裹单号。
 const std::string& Parcel::id() const {
@@ -49,6 +69,10 @@ const std::string& Parcel::sentAt() const {
 // 返回签收时间。
 const std::string& Parcel::receivedAt() const {
     return receivedAt_;
+}
+
+const util::Money& Parcel::fee() const {
+    return fee_;
 }
 
 // 返回包裹状态。

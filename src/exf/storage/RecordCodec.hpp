@@ -4,6 +4,7 @@
 #include <vector>
 #include <string_view>
 #include "exf/domain/User.hpp"
+#include "exf/domain/Parcel.hpp"
 
 namespace exf {
 
@@ -26,5 +27,12 @@ class UserRecordCodec : public RecordCodec {
     static std::string encode(const User& user);
     static User decode(const std::string_view line);
 };
+
+class ParcelRecordCodec : public RecordCodec {
+public:
+    static std::string encode(const Parcel& parcel);
+    static Parcel decode(std::string_view line);
+};
+
 
 }  // namespace exf

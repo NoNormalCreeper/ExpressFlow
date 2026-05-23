@@ -4,6 +4,8 @@
 
 #include <string>
 
+#include "exf/util/Money.hpp"
+
 namespace exf {
 
 /**
@@ -24,7 +26,18 @@ class Parcel {
            std::string receiverUsername,
            std::string description,
            std::string sentAt,
+           std::string receivedAt,
+           util::Money fee,
            ParcelStatus status);
+
+    /** 创建包裹，给业务创建新快递用 */
+    static Parcel createNew(std::string id,
+                        std::string senderUsername,
+                        std::string receiverUsername,
+                        std::string description,
+                        std::string sentAt,
+                        util::Money fee);
+
 
     /**
      * 返回包裹单号。
@@ -56,6 +69,8 @@ class Parcel {
      */
     const std::string& receivedAt() const;
 
+    const util::Money& fee() const;
+
     /**
      * 返回当前包裹状态。
      */
@@ -75,6 +90,9 @@ class Parcel {
 
     /** 收件人用户名。 */
     std::string receiverUsername_;
+
+    /** 包裹实际运费 */
+    util::Money fee_;
 
     /** 用户填写的包裹描述。 */
     std::string description_;
