@@ -96,9 +96,12 @@ endif()
 
 add_executable(unit_tests
     tests/domain/AccountTest.cpp
+    tests/domain/ParcelTest.cpp
+    tests/repository/ParcelRepositoryTest.cpp
     tests/repository/UserRepositoryTest.cpp
     tests/service/UserServiceTest.cpp
     tests/storage/FileStorageTest.cpp
+    tests/storage/ParcelRecordCodecTest.cpp
     tests/storage/RecordCodecTest.cpp
     tests/storage/UserRecordCodecTest.cpp
     tests/util/TimeUtilTest.cpp
