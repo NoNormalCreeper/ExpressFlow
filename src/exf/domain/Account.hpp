@@ -32,6 +32,7 @@ class Account {
      * 尝试从余额扣除正数金额。
      */
     bool debit(exf::util::Money amount);
+    bool debit(double amount);
 
    private:
     /** 当前账户余额。 */

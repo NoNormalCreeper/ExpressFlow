@@ -38,4 +38,8 @@ const Account& Admin::account() const {
     return account_;
 }
 
+Account& Admin::account() {
+    return account_;
+}
+
 }  // namespace exf

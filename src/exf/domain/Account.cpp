@@ -32,4 +32,8 @@ bool Account::debit(exf::util::Money amount) {
     return true;
 }
 
+bool Account::debit(double amount) {
+    return debit(util::Money::from_double(amount));
+}
+
 }  // namespace exf

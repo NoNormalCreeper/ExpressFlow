@@ -43,6 +43,7 @@ class Admin {
      * 返回管理员账户。
      */
     const Account& account() const;
+    Account& account();
 
    private:
     /** 唯一管理员用户名。 */

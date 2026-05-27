@@ -1,6 +1,7 @@
 #pragma once
 
 #include "exf/storage/FileStorage.hpp"
+#include "exf/domain/Admin.hpp"
 namespace exf {
 
 /**
@@ -18,6 +19,8 @@ class AdminRepository {
      * 返回仓储占位对象是否可用。
      */
     bool isReady() const;
+
+    Admin& getAdmin();
 
     private:
     const FileStorage& storage_;
