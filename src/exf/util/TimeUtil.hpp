@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <string>
 #include <string_view>
 #include <chrono>
@@ -18,6 +19,10 @@ class TimeUtil {
     static std::string nowMillisecondString();
     static std::string nowReadableString();
     static std::string formatTimestamp(std::string_view timestamp);
+    static bool isTimestampWithinRange(
+        std::string_view timestamp,
+        const std::optional<std::string>& from = std::nullopt,
+        const std::optional<std::string>& to = std::nullopt);
 
 private:
     static std::string formatTimePoint(const std::chrono::system_clock::time_point& tp);

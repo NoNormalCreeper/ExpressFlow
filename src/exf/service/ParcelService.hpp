@@ -1,4 +1,9 @@
 #pragma once
+
+#include <optional>
+#include <tuple>
+#include <vector>
+
 #include "exf/repository/AdminRepository.hpp"
 #include "exf/repository/ParcelRepository.hpp"
 #include "exf/repository/UserRepository.hpp"
@@ -69,6 +74,9 @@ class ParcelService {
     ParcelRepository& parcels_;
 
     std::vector<Parcel> queryParcels(const ParcelQuery& query) const;
+    static bool matchesUserView(const Parcel& parcel,
+                                const std::string& username,
+                                UserParcelView view);
 };
 
 }  // namespace exf

@@ -1,3 +1,4 @@
+#include "exf/domain/Parcel.hpp"
 #include "exf/domain/ParcelStatus.hpp"
 #include "exf/domain/User.hpp"
 #include "exf/repository/AdminRepository.hpp"
@@ -9,18 +10,23 @@
 
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <chrono>
 #include <filesystem>
 #include <string>
+#include <vector>
 
 namespace {
 
 using exf::AdminRepository;
 using exf::FileStorage;
+using exf::Parcel;
+using exf::ParcelQuery;
 using exf::ParcelRepository;
 using exf::ParcelService;
 using exf::ParcelServiceError;
 using exf::ParcelStatus;
+using exf::UserParcelView;
 using exf::User;
 using exf::UserRepository;
 using exf::util::Money;
@@ -56,6 +62,38 @@ User makeUser(std::string username, double balance) {
                 "secret",
                 "Shanghai",
                 Money::from_double(balance));
+}
+
+Parcel makeWaitingParcel(std::string id,
+                         std::string sender,
+                         std::string receiver,
+                         std::string sentAt,
+                         std::string description = "documents") {
+    return Parcel::createNew(std::move(id), std::move(sender),
+                             std::move(receiver), std::move(description),
+                             std::move(sentAt), Money::from_double(15.0));
+}
+
+Parcel makeSignedParcel(std::string id,
+                        std::string sender,
+                        std::string receiver,
+                        std::string sentAt,
+                        std::string receivedAt,
+                        std::string description = "books") {
+    return Parcel(std::move(id), std::move(sender), std::move(receiver),
+                  std::move(description), std::move(sentAt),
+                  std::move(receivedAt), Money::from_double(15.0),
+                  ParcelStatus::Signed);
+}
+
+std::vector<std::string> sortedParcelIds(const std::vector<Parcel>& parcels) {
+    std::vector<std::string> ids;
+    ids.reserve(parcels.size());
+    for (const auto& parcel : parcels) {
+        ids.push_back(parcel.id());
+    }
+    std::sort(ids.begin(), ids.end());
+    return ids;
 }
 
 TEST(ParcelServiceTest,
@@ -126,6 +164,140 @@ TEST(ParcelServiceTest,
     EXPECT_EQ(admins.getAdmin().account().balance().raw_value(),
               Money::from_double(0.0).raw_value());
     EXPECT_TRUE(parcels.listAll().empty());
+}
+
+TEST(ParcelServiceTest, SignParcelUpdatesStatusForTheReceiver) {
+    const TempDirectory tempDir;
+    const FileStorage storage(tempDir.path());
+    UserRepository users(storage);
+    AdminRepository admins(storage);
+    ParcelRepository parcels(storage);
+    ParcelService service(users, admins, parcels);
+
+    users.createUser(makeUser("alice", 30.0));
+    users.createUser(makeUser("bob", 0.0));
+    parcels.createParcel(
+        makeWaitingParcel("P-1001", "alice", "bob", "1000"));
+
+    EXPECT_EQ(service.signParcel("bob", "P-1001"), ParcelServiceError::Nil);
+
+    const auto* signedParcel = parcels.findParcel("P-1001");
+    ASSERT_NE(signedParcel, nullptr);
+    EXPECT_EQ(signedParcel->status(), ParcelStatus::Signed);
+    EXPECT_FALSE(signedParcel->receivedAt().empty());
+
+    EXPECT_EQ(service.signParcel("bob", "P-1001"),
+              ParcelServiceError::AlreadySigned);
+
+    const ParcelRepository reloadedParcels(storage);
+    const auto* reloadedParcel = reloadedParcels.findParcel("P-1001");
+    ASSERT_NE(reloadedParcel, nullptr);
+    EXPECT_EQ(reloadedParcel->status(), ParcelStatus::Signed);
+    EXPECT_EQ(reloadedParcel->receivedAt(), signedParcel->receivedAt());
+}
+
+TEST(ParcelServiceTest, SignParcelRejectsWrongReceiverAndMissingParcel) {
+    const TempDirectory tempDir;
+    const FileStorage storage(tempDir.path());
+    UserRepository users(storage);
+    AdminRepository admins(storage);
+    ParcelRepository parcels(storage);
+    ParcelService service(users, admins, parcels);
+
+    users.createUser(makeUser("alice", 30.0));
+    users.createUser(makeUser("bob", 0.0));
+    users.createUser(makeUser("carol", 0.0));
+    parcels.createParcel(
+        makeWaitingParcel("P-1001", "alice", "bob", "1000"));
+
+    EXPECT_EQ(service.signParcel("carol", "P-1001"),
+              ParcelServiceError::NotReceiver);
+    EXPECT_EQ(service.signParcel("bob", "missing"),
+              ParcelServiceError::ParcelNotFound);
+
+    const auto* parcel = parcels.findParcel("P-1001");
+    ASSERT_NE(parcel, nullptr);
+    EXPECT_EQ(parcel->status(), ParcelStatus::WaitingForSign);
+    EXPECT_EQ(parcel->receivedAt(), "");
+}
+
+TEST(ParcelServiceTest, QueryUserParcelsRespectsViewAndQuery) {
+    const TempDirectory tempDir;
+    const FileStorage storage(tempDir.path());
+    UserRepository users(storage);
+    AdminRepository admins(storage);
+    ParcelRepository parcels(storage);
+    ParcelService service(users, admins, parcels);
+
+    users.createUser(makeUser("alice", 30.0));
+    users.createUser(makeUser("bob", 0.0));
+    users.createUser(makeUser("carol", 0.0));
+    users.createUser(makeUser("dave", 0.0));
+
+    parcels.createParcel(
+        makeWaitingParcel("P-1001", "alice", "bob", "1000"));
+    parcels.createParcel(
+        makeSignedParcel("P-1002", "alice", "carol", "2000", "2100"));
+    parcels.createParcel(
+        makeWaitingParcel("P-1003", "dave", "alice", "3000"));
+    parcels.createParcel(
+        makeSignedParcel("P-1004", "bob", "alice", "4000", "4100"));
+
+    ParcelQuery query;
+    query.sentFrom = "1500";
+    query.sentTo = "3500";
+
+    EXPECT_EQ(sortedParcelIds(service.queryUserParcels("alice",
+                                                       UserParcelView::Sent,
+                                                       query)),
+              (std::vector<std::string>{"P-1002"}));
+
+    query = ParcelQuery{};
+    query.status = ParcelStatus::WaitingForSign;
+    EXPECT_EQ(sortedParcelIds(service.queryUserParcels(
+                  "alice", UserParcelView::WaitingForSign, query)),
+              (std::vector<std::string>{"P-1003"}));
+
+    query = ParcelQuery{};
+    query.status = ParcelStatus::Signed;
+    EXPECT_EQ(sortedParcelIds(service.queryUserParcels("alice",
+                                                       UserParcelView::Related,
+                                                       query)),
+              (std::vector<std::string>{"P-1002", "P-1004"}));
+}
+
+TEST(ParcelServiceTest, QueryAdminParcelsFiltersAcrossAllParcels) {
+    const TempDirectory tempDir;
+    const FileStorage storage(tempDir.path());
+    UserRepository users(storage);
+    AdminRepository admins(storage);
+    ParcelRepository parcels(storage);
+    ParcelService service(users, admins, parcels);
+
+    users.createUser(makeUser("alice", 30.0));
+    users.createUser(makeUser("bob", 0.0));
+    users.createUser(makeUser("carol", 0.0));
+
+    parcels.createParcel(
+        makeWaitingParcel("P-1001", "alice", "bob", "1000"));
+    parcels.createParcel(
+        makeSignedParcel("P-1002", "alice", "carol", "2000", "2100"));
+    parcels.createParcel(
+        makeWaitingParcel("P-1003", "bob", "alice", "3000"));
+    parcels.createParcel(makeWaitingParcel("P-1004", "carol", "bob",
+                                           "2026-05-23 10:00:00"));
+
+    EXPECT_EQ(sortedParcelIds(service.queryAdminParcels(ParcelQuery{})),
+              (std::vector<std::string>{"P-1001", "P-1002", "P-1003",
+                                        "P-1004"}));
+
+    ParcelQuery query;
+    query.receiverUsername = "alice";
+    query.sentFrom = "1500";
+    query.sentTo = "3500";
+
+    EXPECT_EQ(sortedParcelIds(service.queryAdminParcels(query)),
+              (std::vector<std::string>{"P-1003"}));
 }
 
 }  // namespace

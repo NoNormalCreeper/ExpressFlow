@@ -63,4 +63,26 @@ std::string TimeUtil::formatTimestamp(std::string_view timestamp) {
     return formatTimePoint(parseTimestamp(timestamp));
 }
 
+bool TimeUtil::isTimestampWithinRange(
+    std::string_view timestamp,
+    const std::optional<std::string>& from,
+    const std::optional<std::string>& to) {
+    if (!from.has_value() && !to.has_value()) {
+        return true;
+    }
+
+    try {
+        const auto current = parseTimestamp(timestamp);
+        if (from.has_value() && current < parseTimestamp(*from)) {
+            return false;
+        }
+        if (to.has_value() && current > parseTimestamp(*to)) {
+            return false;
+        }
+        return true;
+    } catch (const std::invalid_argument&) {
+        return false;
+    }
+}
+
 }  // namespace exf
