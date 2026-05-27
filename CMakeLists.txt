@@ -100,6 +100,7 @@ add_executable(unit_tests
     tests/repository/ParcelRepositoryTest.cpp
     tests/repository/UserRepositoryTest.cpp
     tests/service/UserServiceTest.cpp
+    tests/service/ParcelServiceTest.cpp
     tests/storage/FileStorageTest.cpp
     tests/storage/ParcelRecordCodecTest.cpp
     tests/storage/RecordCodecTest.cpp

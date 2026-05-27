@@ -26,19 +26,26 @@ std::tuple<std::string, ParcelServiceError> ParcelService::sendParcel(
         return {"", ParcelServiceError::InvalidDescription};
     }
 
-    const auto id = IdGenerator::newParcelId();
-    const auto sentAt = TimeUtil::nowString();
-    const auto fee = stage1ParcelPrice();
-    if (!users_.modifyUser(senderUsername, [fee](User& user) {
-            return user.account().debit(fee);
-        })) {
+    const auto fee = util::Money::from_double(stage1ParcelPrice());
+    const auto debited =
+        users_
+            .modifyUser(senderUsername,
+                        [fee](User& user) { return user.account().debit(fee); })
+            .value_or(false);
+    if (!debited) {
         return {"", ParcelServiceError::InsufficientBalance};
     }
-    // 占位，实现 admin 相关之后打钱
 
-    const auto parcel =
-        Parcel::createNew(id, senderUsername, receiverUsername, description,
-                          sentAt, util::Money::from_double(fee));
+    if (!admins_.modifyAdmin(
+            [fee](Admin& admin) { admin.account().credit(fee); })) {
+        return {"", ParcelServiceError::AdminNotFound};
+    }
+
+    const auto id = IdGenerator::newParcelId();
+    const auto sentAt = TimeUtil::nowString();
+
+    const auto parcel = Parcel::createNew(id, senderUsername, receiverUsername,
+                                          description, sentAt, fee);
     parcels_.createParcel(parcel);
 
     return {parcel.id(), ParcelServiceError::Nil};

@@ -118,4 +118,24 @@ Parcel ParcelRecordCodec::decode(std::string_view line) {
                   static_cast<ParcelStatus>(std::stoi(fields[7])));
 }
 
+std::string AdminRecordCodec::encode(const Admin& admin) {
+    std::vector<std::string> fields = {
+        admin.username(),                                // 管理员用户名
+        admin.name(),                                    // 管理员显示名
+        admin.password(),                                // 管理员密码
+        exf::util::to_string(admin.account().balance())  // 管理员余额
+    };
+    return join(fields);
+}
+
+Admin AdminRecordCodec::decode(std::string_view line) {
+    const auto fields = split(line);
+    if (fields.size() != 4) {
+        throw std::runtime_error("Invalid admin record: " + std::string(line));
+    }
+
+    return Admin(fields[0], fields[1], fields[2],
+                 util::Money::from_string(fields[3]).to_double());
+}
+
 }  // namespace exf
