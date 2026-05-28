@@ -1,5 +1,9 @@
 #include "ConsoleInput.hpp"
+
+#include <exception>
 #include <iostream>
+
+#include "exf/util/TimeUtil.hpp"
 
 namespace exf {
 std::string ConsoleInput::promptLine(std::string_view label) {
@@ -13,6 +17,33 @@ std::string ConsoleInput::promptNonEmpty(std::string_view label) {
     return promptIf(
         label, [](const std::string& input) { return !input.empty(); },
         "输入不能为空，请重新输入。");
+}
+
+std::optional<std::string> ConsoleInput::promptOptionalText(
+    std::string_view label) {
+    auto input = promptLine(label);
+    if (input.empty()) {
+        return std::nullopt;
+    }
+    return input;
+}
+
+std::optional<std::string> ConsoleInput::promptOptionalTimestamp(
+    std::string_view label) {
+    while (true) {
+        auto input = promptLine(label);
+        if (input.empty()) {
+            return std::nullopt;
+        }
+
+        try {
+            (void)TimeUtil::formatTimestamp(input);
+            return input;
+        } catch (const std::exception&) {
+            std::cout << "请输入有效时间，格式为 YYYY-MM-DD "
+                         "HH:MM:SS；留空表示不限制。\n";
+        }
+    }
 }
 
 util::Money ConsoleInput::promptNonNegativeMoney(std::string_view label) {

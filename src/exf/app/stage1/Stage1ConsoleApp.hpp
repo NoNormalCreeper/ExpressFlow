@@ -1,5 +1,11 @@
 #pragma once
 
+#include <cstddef>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <vector>
+
 #include "ConsoleInput.hpp"
 #include "ConsoleMenu.hpp"
 #include "exf/repository/UserRepository.hpp"
@@ -31,17 +37,37 @@ class Stage1ConsoleApp {
     FileStorage storage_;
     UserRepository userRepository_;
     AdminRepository adminRepository_;
+    ParcelRepository parcelRepository_;
 
     AuthService authService_;
     UserService userService_;
+    ParcelService parcelService_;
 
     void handleUserRegister();
     void handleUserLogin(MainMenu::Context& ctx);
+    void handleAdminLogin(MainMenu::Context& ctx);
+    void handleLogout(MainMenu::Context& ctx);
     void handleChangePassword(MainMenu::Context& ctx);
 
     // 约定登录后调用
     void handleGetBalance(MainMenu::Context& ctx);
     void handleTopUpBalance(MainMenu::Context& ctx);
+
+    void handleSendParcel(MainMenu::Context& ctx);
+    void handleSignParcels(MainMenu::Context& ctx);
+    void handleQueryUserParcels(MainMenu::Context& ctx);
+    void handleQueryAdminParcels(MainMenu::Context& ctx);
+
+    static ParcelQuery promptUserParcelQuery();
+    static ParcelQuery promptAdminParcelQuery();
+    static std::optional<ParcelStatus> promptOptionalParcelStatus(
+        std::string_view label);
+    static std::optional<std::vector<size_t>> parseSelectionIndices(
+        std::string_view input,
+        size_t maxCount);
+    static std::string parcelStatusText(ParcelStatus status);
+    static std::string formatTimestampForDisplay(std::string_view timestamp);
+    static void printParcelList(const std::vector<Parcel>& parcels);
 };
 
 }  // namespace exf

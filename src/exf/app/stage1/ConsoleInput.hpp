@@ -1,6 +1,12 @@
 
+#pragma once
+
 #include <functional>
+#include <optional>
 #include <regex>
+#include <string>
+#include <string_view>
+
 #include "exf/util/Money.hpp"
 
 namespace exf {
@@ -9,6 +15,10 @@ class ConsoleInput {
    public:
     static std::string promptLine(std::string_view label);
     static std::string promptNonEmpty(std::string_view label);
+    static std::optional<std::string> promptOptionalText(
+        std::string_view label);
+    static std::optional<std::string> promptOptionalTimestamp(
+        std::string_view label);
     static util::Money promptNonNegativeMoney(std::string_view label);
     static std::string promptRegex(
         std::string_view label,
