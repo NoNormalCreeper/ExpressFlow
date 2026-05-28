@@ -9,6 +9,7 @@
 #include "ConsoleInput.hpp"
 #include "ConsoleMenu.hpp"
 #include "exf/repository/UserRepository.hpp"
+#include "exf/service/AdminService.hpp"
 #include "exf/service/AuthService.hpp"
 #include "exf/service/ParcelService.hpp"
 #include "exf/service/UserService.hpp"
@@ -41,6 +42,7 @@ class Stage1ConsoleApp {
 
     AuthService authService_;
     UserService userService_;
+    AdminService adminService_;
     ParcelService parcelService_;
 
     void handleUserRegister();
@@ -56,6 +58,7 @@ class Stage1ConsoleApp {
     void handleSendParcel(MainMenu::Context& ctx);
     void handleSignParcels(MainMenu::Context& ctx);
     void handleQueryUserParcels(MainMenu::Context& ctx);
+    void handleListUsers(MainMenu::Context& ctx);
     void handleQueryAdminParcels(MainMenu::Context& ctx);
 
     static ParcelQuery promptUserParcelQuery();
@@ -67,6 +70,7 @@ class Stage1ConsoleApp {
         size_t maxCount);
     static std::string parcelStatusText(ParcelStatus status);
     static std::string formatTimestampForDisplay(std::string_view timestamp);
+    static void printUserList(const std::vector<User>& users);
     static void printParcelList(const std::vector<Parcel>& parcels);
 };
 

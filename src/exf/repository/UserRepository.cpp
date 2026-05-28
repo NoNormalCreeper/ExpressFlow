@@ -62,4 +62,8 @@ void UserRepository::updateUser(const std::string_view& username, const User& us
     saveUsers();
 }
 
+const std::vector<User>& UserRepository::listAll() const {
+    return users_;
+}
+
 }  // namespace exf

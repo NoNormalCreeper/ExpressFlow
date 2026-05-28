@@ -1,5 +1,9 @@
 #pragma once
 
+#include "exf/repository/UserRepository.hpp"
+
+#include <vector>
+
 namespace exf {
 
 /**
@@ -8,14 +12,22 @@ namespace exf {
 class AdminService {
    public:
     /**
-     * 创建服务占位对象。
+     * 创建管理员服务。
      */
-    AdminService();
+    explicit AdminService(UserRepository& users);
 
     /**
      * 返回服务占位对象是否可用。
      */
     bool isReady() const;
+
+    /**
+     * 返回当前所有注册用户，供管理员查看。
+     */
+    std::vector<User> listUsers() const;
+
+   private:
+    UserRepository& users_;
 };
 
 }  // namespace exf

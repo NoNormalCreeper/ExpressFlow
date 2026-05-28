@@ -96,11 +96,15 @@ endif()
 
 add_executable(unit_tests
     src/exf/app/stage1/ConsoleInput.cpp
+    src/exf/app/stage1/ConsoleMenu.cpp
+    src/exf/app/stage1/Stage1ConsoleApp.cpp
     tests/domain/AccountTest.cpp
     tests/domain/ParcelTest.cpp
     tests/app/stage1/ConsoleInputTest.cpp
+    tests/app/stage1/Stage1ConsoleAppTest.cpp
     tests/repository/ParcelRepositoryTest.cpp
     tests/repository/UserRepositoryTest.cpp
+    tests/service/AdminServiceTest.cpp
     tests/service/UserServiceTest.cpp
     tests/service/ParcelServiceTest.cpp
     tests/storage/FileStorageTest.cpp

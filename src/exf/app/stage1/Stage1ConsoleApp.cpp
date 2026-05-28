@@ -18,6 +18,7 @@ Stage1ConsoleApp::Stage1ConsoleApp(std::filesystem::path dataDir)
       parcelRepository_(storage_),
       authService_(userRepository_, adminRepository_),
       userService_(userRepository_),
+      adminService_(userRepository_),
       parcelService_(userRepository_, adminRepository_, parcelRepository_) {}
 
 void Stage1ConsoleApp::handleUserRegister() {
@@ -362,9 +363,22 @@ void Stage1ConsoleApp::handleQueryAdminParcels(MainMenu::Context& ctx) {
     printParcelList(parcelService_.queryAdminParcels(query));
 }
 
+void Stage1ConsoleApp::handleListUsers(MainMenu::Context& ctx) {
+    if (ctx.loggedIn != 2) {
+        std::cout << "请先使用管理员身份登录。\n";
+        return;
+    }
+
+    printUserList(adminService_.listUsers());
+}
+
 ParcelQuery Stage1ConsoleApp::promptUserParcelQuery() {
     ParcelQuery query;
     query.id = ConsoleInput::promptOptionalText("请输入快递单号（可留空）");
+    query.senderUsername =
+        ConsoleInput::promptOptionalText("请输入发件人用户名（可留空）");
+    query.receiverUsername =
+        ConsoleInput::promptOptionalText("请输入收件人用户名（可留空）");
     query.status = promptOptionalParcelStatus("请选择状态筛选");
     query.sentFrom = ConsoleInput::promptOptionalTimestamp(
         "请输入起始寄件时间（YYYY-MM-DD HH:MM:SS，可留空）");
@@ -502,6 +516,22 @@ void Stage1ConsoleApp::printParcelList(const std::vector<Parcel>& parcels) {
     }
 }
 
+void Stage1ConsoleApp::printUserList(const std::vector<User>& users) {
+    if (users.empty()) {
+        std::cout << "暂无注册用户。\n";
+        return;
+    }
+
+    std::cout << "共 " << users.size() << " 个用户：\n";
+    for (size_t i = 0; i < users.size(); ++i) {
+        const auto& user = users[i];
+        std::cout << "  [" << (i + 1) << "] " << user.username() << " | "
+                  << user.name() << " | " << user.phone() << " | "
+                  << user.address() << " | 余额: "
+                  << user.account().balance() << " 元\n";
+    }
+}
+
 int Stage1ConsoleApp::run() {
     std::cout << "ExpressFlow Stage 1" << '\n';
 
@@ -567,6 +597,9 @@ int Stage1ConsoleApp::run() {
                 int adminChoice = ConsoleMenu::showAdminMenu(ctx);
                 switch (adminChoice) {
                     case 1:
+                        handleListUsers(ctx);
+                        break;
+                    case 2:
                         handleQueryAdminParcels(ctx);
                         break;
                     default:

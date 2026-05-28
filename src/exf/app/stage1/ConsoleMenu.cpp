@@ -82,11 +82,13 @@ int ConsoleMenu::showParcelMenu(const MainMenu::Context& ctx) {
 }
 
 int ConsoleMenu::showAdminMenu(const MainMenu::Context& ctx) {
-    const std::vector<std::string> options = {"查询全部快递", "返回主菜单"};
+    const std::vector<std::string> options = {"查看所有用户信息",
+                                              "查询全部快递",
+                                              "返回主菜单"};
     printSeparator();
     if (ctx.loggedIn != 2) {
         std::cout << "请先使用管理员身份登录。\n";
-        return 2;
+        return 3;
     }
 
     printMenu("管理员菜单", options);
