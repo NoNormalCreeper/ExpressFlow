@@ -95,8 +95,10 @@ else()
 endif()
 
 add_executable(unit_tests
+    src/exf/app/stage1/ConsoleInput.cpp
     tests/domain/AccountTest.cpp
     tests/domain/ParcelTest.cpp
+    tests/app/stage1/ConsoleInputTest.cpp
     tests/repository/ParcelRepositoryTest.cpp
     tests/repository/UserRepositoryTest.cpp
     tests/service/UserServiceTest.cpp

@@ -12,8 +12,9 @@ namespace exf {
 
 std::string TimeUtil::formatTimePoint(
     const std::chrono::system_clock::time_point& tp) {
-    return std::format("{:%Y-%m-%d %H:%M:%S}",
-                       std::chrono::floor<std::chrono::seconds>(tp));
+    using namespace std::chrono;
+    const auto tp_utc8 = tp + displayUtcOffset();
+    return std::format("{:%Y-%m-%d %H:%M:%S}", floor<seconds>(tp_utc8));
 }
 
 std::chrono::system_clock::time_point TimeUtil::parseTimestamp(
@@ -27,7 +28,47 @@ std::chrono::system_clock::time_point TimeUtil::parseTimestamp(
     const auto* end = begin + timestamp.size();
     const auto [ptr, ec] = std::from_chars(begin, end, value);
     if (ec != std::errc{} || ptr != end) {
-        throw std::invalid_argument("timestamp is not a valid integer");
+        if (timestamp.size() != 19 || timestamp[4] != '-' ||
+            timestamp[7] != '-' || timestamp[10] != ' ' ||
+            timestamp[13] != ':' || timestamp[16] != ':') {
+            throw std::invalid_argument("timestamp is not valid");
+        }
+
+        auto parsePart = [timestamp](size_t pos, size_t len) {
+            int part = 0;
+            const auto* partBegin = timestamp.data() + pos;
+            const auto* partEnd = partBegin + len;
+            const auto [partPtr, partEc] =
+                std::from_chars(partBegin, partEnd, part);
+            if (partEc != std::errc{} || partPtr != partEnd) {
+                throw std::invalid_argument("timestamp is not valid");
+            }
+            return part;
+        };
+
+        const int yearValue = parsePart(0, 4);
+        const int monthValue = parsePart(5, 2);
+        const int dayValue = parsePart(8, 2);
+        const int hourValue = parsePart(11, 2);
+        const int minuteValue = parsePart(14, 2);
+        const int secondValue = parsePart(17, 2);
+
+        using namespace std::chrono;
+        if (hourValue < 0 || hourValue > 23 || minuteValue < 0 ||
+            minuteValue > 59 || secondValue < 0 || secondValue > 60) {
+            throw std::invalid_argument("timestamp is not valid");
+        }
+
+        const year_month_day ymd{year{yearValue},
+                                 month{static_cast<unsigned>(monthValue)},
+                                 day{static_cast<unsigned>(dayValue)}};
+        if (!ymd.ok()) {
+            throw std::invalid_argument("timestamp is not valid");
+        }
+
+        const sys_days days{ymd};
+        return days + hours{hourValue} + minutes{minuteValue} +
+               seconds{secondValue} - displayUtcOffset();
     }
 
     using namespace std::chrono;
@@ -49,9 +90,9 @@ std::string TimeUtil::nowString() {
 
 std::string TimeUtil::nowMillisecondString() {
     const auto now = std::chrono::system_clock::now();
-    const auto millis =
-        std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch())
-            .count();
+    const auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(
+                            now.time_since_epoch())
+                            .count();
     return std::to_string(millis);
 }
 
@@ -63,10 +104,9 @@ std::string TimeUtil::formatTimestamp(std::string_view timestamp) {
     return formatTimePoint(parseTimestamp(timestamp));
 }
 
-bool TimeUtil::isTimestampWithinRange(
-    std::string_view timestamp,
-    const std::optional<std::string>& from,
-    const std::optional<std::string>& to) {
+bool TimeUtil::isTimestampWithinRange(std::string_view timestamp,
+                                      const std::optional<std::string>& from,
+                                      const std::optional<std::string>& to) {
     if (!from.has_value() && !to.has_value()) {
         return true;
     }
