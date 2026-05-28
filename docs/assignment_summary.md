@@ -44,10 +44,10 @@
 
 ## 当前工程对应关系
 
-- 当前只初始化题目一工程骨架，不实现完整业务。
+- 当前已实现题目一单机版主流程。
 - `core` 承载 `src/exf/domain`、`src/exf/service`、`src/exf/repository`、`src/exf/storage`、`src/exf/util`。
 - `stage1` 是题目一控制台程序入口，包含 `apps/stage1/main.cpp` 和 `src/exf/app/stage1`，只链接 `core`。
-- `unit_tests` 链接 `core`，用于验证基础领域对象和工具类。
+- `unit_tests` 链接 `core`，用于验证基础领域对象、仓储、服务、存储和主要控制台路径。
 - `.hpp` 和 `.cpp` 放在同一个模块目录中，方便课程作业阶段同步修改声明和实现。
 - 题目一枚举只包含 `User`、`Admin`、`WaitingForSign`、`Signed`。
 - 快递员、待揽收状态、物品继承体系、网络层将在后续题目中加入。
