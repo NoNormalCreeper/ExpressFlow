@@ -1,4 +1,5 @@
 #include "exf/repository/UserRepository.hpp"
+#include "exf/repository/AdminRepository.hpp"
 #include "exf/service/AdminService.hpp"
 #include "exf/storage/FileStorage.hpp"
 #include "exf/util/Money.hpp"
@@ -12,6 +13,7 @@
 namespace {
 
 using exf::AdminService;
+using exf::AdminRepository;
 using exf::FileStorage;
 using exf::User;
 using exf::UserRepository;
@@ -63,6 +65,18 @@ TEST(AdminServiceTest, ListsAllRegisteredUsers) {
     ASSERT_EQ(listedUsers.size(), 2U);
     EXPECT_EQ(listedUsers[0].username(), "alice");
     EXPECT_EQ(listedUsers[1].username(), "bob");
+}
+
+TEST(AdminServiceTest, GetsAdminAccountBalance) {
+    const TempDirectory tempDir;
+    const FileStorage storage(tempDir.path());
+    UserRepository users(storage);
+    AdminRepository admins(storage);
+    admins.modifyAdmin(
+        [](exf::Admin& admin) { admin.account().credit(Money::from_double(42.0)); });
+    AdminService service(users, admins);
+
+    EXPECT_EQ(service.getBalance(), Money::from_double(42.0));
 }
 
 }  // namespace

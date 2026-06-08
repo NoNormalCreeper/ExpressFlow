@@ -48,6 +48,8 @@ target_compile_features(core PUBLIC cxx_std_20)
 
 add_executable(stage2
     apps/stage2/main.cpp
+    src/exf/app/console/ConsoleInput.cpp
+    src/exf/app/stage2/Stage2ConsoleMenu.cpp
     src/exf/app/stage2/Stage2ConsoleApp.cpp
 )
 
@@ -97,6 +99,9 @@ else()
 endif()
 
 add_executable(unit_tests
+    src/exf/app/console/ConsoleInput.cpp
+    src/exf/app/stage2/Stage2ConsoleApp.cpp
+    src/exf/app/stage2/Stage2ConsoleMenu.cpp
     tests/domain/AccountTest.cpp
     tests/domain/CourierTest.cpp
     tests/domain/ItemTest.cpp
@@ -108,6 +113,8 @@ add_executable(unit_tests
     tests/service/CourierServiceTest.cpp
     tests/service/UserServiceTest.cpp
     tests/service/ParcelServiceTest.cpp
+    tests/app/console/ConsoleInputTest.cpp
+    tests/app/stage2/Stage2ConsoleAppTest.cpp
     tests/storage/FileStorageTest.cpp
     tests/storage/CourierRecordCodecTest.cpp
     tests/storage/ParcelRecordCodecTest.cpp

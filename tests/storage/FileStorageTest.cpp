@@ -50,4 +50,23 @@ TEST(FileStorageTest, WritesAndReadsLinesFromConfiguredBasePath) {
     EXPECT_TRUE(std::filesystem::exists(tempDir.path() / "users.txt"));
 }
 
+TEST(FileStorageTest, CreatesConfiguredBasePathWhenWritingLines) {
+    const auto path = std::filesystem::temp_directory_path() /
+                      ("expressflow-file-storage-missing-dir-test-" +
+                       std::to_string(std::chrono::steady_clock::now()
+                                          .time_since_epoch()
+                                          .count()));
+    std::error_code ignored;
+    std::filesystem::remove_all(path, ignored);
+    const exf::FileStorage storage(path);
+    const std::vector<std::string> lines = {"created"};
+
+    storage.writeLines("users.txt", lines);
+
+    EXPECT_EQ(storage.readLines("users.txt"), lines);
+    EXPECT_TRUE(std::filesystem::exists(path / "users.txt"));
+
+    std::filesystem::remove_all(path, ignored);
+}
+
 }  // namespace

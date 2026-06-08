@@ -1,6 +1,8 @@
 #pragma once
 
+#include "exf/repository/AdminRepository.hpp"
 #include "exf/repository/UserRepository.hpp"
+#include "exf/util/Money.hpp"
 
 #include <vector>
 
@@ -15,6 +17,7 @@ class AdminService {
      * 创建管理员服务。
      */
     explicit AdminService(UserRepository& users);
+    AdminService(UserRepository& users, AdminRepository& admins);
 
     /**
      * 返回服务占位对象是否可用。
@@ -26,8 +29,14 @@ class AdminService {
      */
     std::vector<User> listUsers() const;
 
+    /**
+     * 返回管理员账户余额。
+     */
+    util::Money getBalance() const;
+
    private:
     UserRepository& users_;
+    AdminRepository* admins_ = nullptr;
 };
 
 }  // namespace exf

@@ -34,7 +34,9 @@ std::vector<std::string> FileStorage::readLines(
  */
 void FileStorage::writeLines(const std::filesystem::path& relativePath,
                              const std::vector<std::string>& lines) const {
-    std::ofstream file(basePath_ / relativePath);
+    const auto targetPath = basePath_ / relativePath;
+    std::filesystem::create_directories(targetPath.parent_path());
+    std::ofstream file(targetPath);
 
     for (const auto& line : lines) {
         file << line << '\n';
