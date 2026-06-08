@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "exf/domain/Admin.hpp"
+#include "exf/domain/Courier.hpp"
 #include "exf/domain/User.hpp"
 #include "exf/domain/Parcel.hpp"
 
@@ -42,5 +43,10 @@ class AdminRecordCodec : public RecordCodec {
     static Admin decode(std::string_view line);
 };
 
+class CourierRecordCodec : public RecordCodec {
+   public:
+    static std::string encode(const Courier& courier);
+    static Courier decode(std::string_view line);
+};
 
 }  // namespace exf

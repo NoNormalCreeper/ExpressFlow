@@ -23,9 +23,12 @@ endif()
 add_library(core STATIC
     src/exf/domain/Account.cpp
     src/exf/domain/Admin.cpp
+    src/exf/domain/Courier.cpp
+    src/exf/domain/Item.cpp
     src/exf/domain/Parcel.cpp
     src/exf/domain/User.cpp
     src/exf/repository/AdminRepository.cpp
+    src/exf/repository/CourierRepository.cpp
     src/exf/repository/ParcelRepository.cpp
     src/exf/repository/UserRepository.cpp
     src/exf/service/AdminService.cpp
@@ -38,6 +41,7 @@ add_library(core STATIC
     src/exf/util/StringUtil.cpp
     src/exf/util/TimeUtil.cpp
     src/exf/util/Validator.cpp
+        src/exf/repository/CourierRepository.hpp
 )
 target_include_directories(core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_compile_features(core PUBLIC cxx_std_20)
@@ -106,15 +110,19 @@ add_executable(unit_tests
     src/exf/app/stage1/ConsoleMenu.cpp
     src/exf/app/stage1/Stage1ConsoleApp.cpp
     tests/domain/AccountTest.cpp
+    tests/domain/CourierTest.cpp
+    tests/domain/ItemTest.cpp
     tests/domain/ParcelTest.cpp
     tests/app/stage1/ConsoleInputTest.cpp
     tests/app/stage1/Stage1ConsoleAppTest.cpp
     tests/repository/ParcelRepositoryTest.cpp
+    tests/repository/CourierRepositoryTest.cpp
     tests/repository/UserRepositoryTest.cpp
     tests/service/AdminServiceTest.cpp
     tests/service/UserServiceTest.cpp
     tests/service/ParcelServiceTest.cpp
     tests/storage/FileStorageTest.cpp
+    tests/storage/CourierRecordCodecTest.cpp
     tests/storage/ParcelRecordCodecTest.cpp
     tests/storage/RecordCodecTest.cpp
     tests/storage/UserRecordCodecTest.cpp

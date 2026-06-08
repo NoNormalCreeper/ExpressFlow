@@ -1,5 +1,6 @@
 #include "exf/storage/RecordCodec.hpp"
 
+#include "exf/domain/Courier.hpp"
 #include "exf/domain/ParcelItemType.hpp"
 #include "exf/domain/User.hpp"
 
@@ -151,6 +152,31 @@ Admin AdminRecordCodec::decode(std::string_view line) {
 
     return Admin(fields[0], fields[1], fields[2],
                  util::Money::from_string(fields[3]).to_double());
+}
+
+std::string CourierRecordCodec::encode(const Courier& courier) {
+    std::vector<std::string> fields = {
+        courier.username(),                              // 快递员用户名
+        courier.name(),                                  // 快递员姓名
+        courier.phone(),                                 // 快递员手机号
+        courier.password(),                              // 快递员密码
+        exf::util::to_string(courier.account().balance()) // 快递员余额
+    };
+    return join(fields);
+}
+
+Courier CourierRecordCodec::decode(std::string_view line) {
+    const auto fields = split(line);
+    if (fields.size() != 5) {
+        throw std::runtime_error("Invalid courier record: " +
+                                 std::string(line));
+    }
+
+    return Courier(fields[0],
+                   fields[1],
+                   fields[2],
+                   fields[3],
+                   util::Money::from_string(fields[4]));
 }
 
 }  // namespace exf
