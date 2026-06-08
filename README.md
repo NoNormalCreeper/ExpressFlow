@@ -1,19 +1,19 @@
 # ExpressFlow
 
-ExpressFlow 是《面向对象编程实践（C++）》期末作业“物流管理系统设计与实现”的阶段式实现。当前仓库已完成题目一单机版主流程，并保留可测试、可继续演进的分层结构。
+ExpressFlow 是《面向对象编程实践（C++）》期末作业“物流管理系统设计与实现”的阶段式实现。当前工作树面向题目二单机版开发；题目一版本保留在前序提交中。
 
 ## 题目演进
 
-- `stage1`：单机版，实现用户注册/登录、修改密码、余额管理、发送快递、接收快递、查询快递、管理员物流业务管理。
-- `stage2`：在题目一基础上加入快递员、快递分类、物品继承体系、待揽收状态、管理员分配快递员、快递员揽收收益。
+- `stage1`：题目一单机版，保留在前序提交中。
+- `stage2`：当前工作树，在题目一基础上加入快递员、快递分类、物品继承体系、待揽收状态、管理员分配快递员、快递员揽收收益。
 - `stage3`：在题目二基础上改为传统 C/S socket 网络版，客户端和服务器为不同进程，不使用 RPC 框架。
 
 ## 当前阶段
 
-当前题目一主流程已落到控制台程序中：
+当前题目二核心领域层和服务层已开始落地：
 
 - `core`：业务核心库，包含 `domain`、`service`、`repository`、`storage`、`util`。
-- `stage1`：题目一控制台入口，包含 `apps/stage1/main.cpp` 和 `src/exf/app/stage1/Stage1ConsoleApp`。
+- `stage2`：题目二控制台入口，包含 `apps/stage2/main.cpp` 和 `src/exf/app/stage2/Stage2ConsoleApp`。
 - `unit_tests`：单元测试目标，覆盖领域对象、仓储、服务、存储和主要控制台路径。
 
 `core` 不包含 `main()`，不包含 `app/`，不直接使用 `cin/cout`。控制台输入输出只放在应用入口层。
@@ -27,7 +27,7 @@ ExpressFlow 是《面向对象编程实践（C++）》期末作业“物流管�
 ├─ CMakeLists.txt
 ├─ README.md
 ├─ apps/
-│  └─ stage1/
+│  └─ stage2/
 │     └─ main.cpp
 ├─ src/
 │  └─ exf/
@@ -37,7 +37,7 @@ ExpressFlow 是《面向对象编程实践（C++）》期末作业“物流管�
 │     ├─ storage/
 │     ├─ util/
 │     └─ app/
-│        └─ stage1/
+│        └─ stage2/
 ├─ tests/
 │  └─ test_smoke.cpp
 ├─ docs/
@@ -74,10 +74,10 @@ cmake --build build
 ## 运行
 
 ```bash
-./build/stage1
+./build/stage2
 ```
 
-Windows 环境下可运行生成的 `stage1.exe`。
+Windows 环境下可运行生成的 `stage2.exe`。
 
 ## 测试
 
@@ -99,4 +99,4 @@ ctest --test-dir build
 - repository/storage 负责持久化边界。
 - domain 表达领域对象和对象自身行为。
 - util 只放不依赖界面的通用工具。
-- 题目一代码不提前加入快递员、待揽收状态或网络层。
+- 题目二代码围绕快递员、物品分类、待揽收和揽收分账流程展开。

@@ -33,6 +33,7 @@ add_library(core STATIC
     src/exf/repository/UserRepository.cpp
     src/exf/service/AdminService.cpp
     src/exf/service/AuthService.cpp
+    src/exf/service/CourierService.cpp
     src/exf/service/ParcelService.cpp
     src/exf/service/UserService.cpp
     src/exf/storage/FileStorage.cpp
@@ -41,19 +42,9 @@ add_library(core STATIC
     src/exf/util/StringUtil.cpp
     src/exf/util/TimeUtil.cpp
     src/exf/util/Validator.cpp
-        src/exf/repository/CourierRepository.hpp
 )
 target_include_directories(core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_compile_features(core PUBLIC cxx_std_20)
-
-add_executable(stage1
-    apps/stage1/main.cpp
-    src/exf/app/stage1/Stage1ConsoleApp.cpp
-    src/exf/app/stage1/ConsoleInput.cpp
-    src/exf/app/stage1/ConsoleMenu.cpp
-)
-
-target_link_libraries(stage1 PRIVATE core)
 
 add_executable(stage2
     apps/stage2/main.cpp
@@ -63,8 +54,8 @@ add_executable(stage2
 target_link_libraries(stage2 PRIVATE core)
 
 add_custom_target(run
-    COMMAND $<TARGET_FILE:stage1>
-    DEPENDS stage1
+    COMMAND $<TARGET_FILE:stage2>
+    DEPENDS stage2
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
 
@@ -106,19 +97,15 @@ else()
 endif()
 
 add_executable(unit_tests
-    src/exf/app/stage1/ConsoleInput.cpp
-    src/exf/app/stage1/ConsoleMenu.cpp
-    src/exf/app/stage1/Stage1ConsoleApp.cpp
     tests/domain/AccountTest.cpp
     tests/domain/CourierTest.cpp
     tests/domain/ItemTest.cpp
     tests/domain/ParcelTest.cpp
-    tests/app/stage1/ConsoleInputTest.cpp
-    tests/app/stage1/Stage1ConsoleAppTest.cpp
     tests/repository/ParcelRepositoryTest.cpp
     tests/repository/CourierRepositoryTest.cpp
     tests/repository/UserRepositoryTest.cpp
     tests/service/AdminServiceTest.cpp
+    tests/service/CourierServiceTest.cpp
     tests/service/UserServiceTest.cpp
     tests/service/ParcelServiceTest.cpp
     tests/storage/FileStorageTest.cpp

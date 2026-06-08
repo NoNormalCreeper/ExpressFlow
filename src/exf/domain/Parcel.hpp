@@ -10,7 +10,7 @@
 namespace exf {
 
 /**
- * Parcel 保存阶段 1 中寄件人和收件人的包裹记录。
+ * Parcel 保存阶段 2 中寄件、揽收和签收流程的包裹记录。
  */
 class Parcel {
    public:
@@ -34,14 +34,6 @@ class Parcel {
            double itemAmount = 1.0,
            std::string courierUsername = "",
            std::string pickedAt = "");
-
-    /** 创建包裹，给业务创建新快递用 */
-    static Parcel createNew(std::string id,
-                        std::string senderUsername,
-                        std::string receiverUsername,
-                        std::string description,
-                        std::string sentAt,
-                        util::Money fee);
 
     /**
      * 创建阶段 2 待揽收包裹，保存物品分类和计费数量。
@@ -161,7 +153,7 @@ class Parcel {
     /** 快递员揽收时间。 */
     std::string pickedAt_;
 
-    /** 阶段 1 包裹状态。 */
+    /** 包裹当前状态。 */
     ParcelStatus status_;
 };
 

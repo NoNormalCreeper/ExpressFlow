@@ -115,14 +115,8 @@ std::string ParcelRecordCodec::encode(const Parcel& parcel) {
 
 Parcel ParcelRecordCodec::decode(std::string_view line) {
     const auto fields = split(line);
-    if (fields.size() != 8 && fields.size() != 12) {
+    if (fields.size() != 12) {
         throw std::runtime_error("Invalid parcel record: " + std::string(line));
-    }
-
-    if (fields.size() == 8) {
-        return Parcel(fields[0], fields[1], fields[2], fields[3], fields[4],
-                      fields[5], util::Money::from_string(fields[6]),
-                      static_cast<ParcelStatus>(std::stoi(fields[7])));
     }
 
     return Parcel(fields[0], fields[1], fields[2], fields[3], fields[4],

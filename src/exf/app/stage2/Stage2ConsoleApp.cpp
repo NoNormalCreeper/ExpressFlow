@@ -9,6 +9,7 @@ Stage2ConsoleApp::Stage2ConsoleApp(std::filesystem::path dataDir)
     : storage_(std::move(dataDir)),
       userRepository_(storage_),
       adminRepository_(storage_),
+      courierRepository_(storage_),
       parcelRepository_(storage_) {}
 
 int Stage2ConsoleApp::run() {

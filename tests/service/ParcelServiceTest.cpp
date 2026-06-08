@@ -1,7 +1,10 @@
 #include "exf/domain/Parcel.hpp"
+#include "exf/domain/Courier.hpp"
+#include "exf/domain/Item.hpp"
 #include "exf/domain/ParcelStatus.hpp"
 #include "exf/domain/User.hpp"
 #include "exf/repository/AdminRepository.hpp"
+#include "exf/repository/CourierRepository.hpp"
 #include "exf/repository/ParcelRepository.hpp"
 #include "exf/repository/UserRepository.hpp"
 #include "exf/service/ParcelService.hpp"
@@ -19,7 +22,12 @@
 namespace {
 
 using exf::AdminRepository;
+using exf::BookItem;
+using exf::Courier;
+using exf::CourierParcelView;
+using exf::CourierRepository;
 using exf::FileStorage;
+using exf::FragileItem;
 using exf::Parcel;
 using exf::ParcelQuery;
 using exf::ParcelRepository;
@@ -64,14 +72,42 @@ User makeUser(std::string username, double balance) {
                 Money::from_double(balance));
 }
 
+Courier makeCourier(std::string username, double balance = 0.0) {
+    return Courier(std::move(username),
+                   "Courier",
+                   "13900000000",
+                   "secret",
+                   Money::from_double(balance));
+}
+
 Parcel makeWaitingParcel(std::string id,
                          std::string sender,
                          std::string receiver,
                          std::string sentAt,
                          std::string description = "documents") {
-    return Parcel::createNew(std::move(id), std::move(sender),
-                             std::move(receiver), std::move(description),
-                             std::move(sentAt), Money::from_double(15.0));
+    return Parcel::createWaitingForPickup(std::move(id),
+                                          std::move(sender),
+                                          std::move(receiver),
+                                          std::move(description),
+                                          std::move(sentAt),
+                                          Money::from_double(15.0),
+                                          exf::ParcelItemType::Standard,
+                                          3.0);
+}
+
+Parcel makeWaitingForSignParcel(std::string id,
+                                std::string sender,
+                                std::string receiver,
+                                std::string sentAt,
+                                std::string description = "documents") {
+    Parcel parcel = makeWaitingParcel(std::move(id),
+                                      std::move(sender),
+                                      std::move(receiver),
+                                      std::move(sentAt),
+                                      std::move(description));
+    parcel.assignCourier("c01");
+    parcel.markPickedUp("2026-05-23 11:00:00");
+    return parcel;
 }
 
 Parcel makeSignedParcel(std::string id,
@@ -96,88 +132,19 @@ std::vector<std::string> sortedParcelIds(const std::vector<Parcel>& parcels) {
     return ids;
 }
 
-TEST(ParcelServiceTest,
-     SendParcelChargesSenderCreditsAdminAndPersistsParcel) {
-    const TempDirectory tempDir;
-    const FileStorage storage(tempDir.path());
-    UserRepository users(storage);
-    AdminRepository admins(storage);
-    ParcelRepository parcels(storage);
-    ParcelService service(users, admins, parcels);
-
-    users.createUser(makeUser("alice", 30.0));
-    users.createUser(makeUser("bob", 0.0));
-
-    const auto [parcelId, error] =
-        service.sendParcel("alice", "bob", "documents");
-
-    EXPECT_EQ(error, ParcelServiceError::Nil);
-    EXPECT_FALSE(parcelId.empty());
-
-    const auto expectedBalance = Money::from_double(15.0).raw_value();
-    ASSERT_NE(users.findUser("alice"), nullptr);
-    EXPECT_EQ(users.findUser("alice")->account().balance().raw_value(),
-              expectedBalance);
-    EXPECT_EQ(admins.getAdmin().account().balance().raw_value(),
-              expectedBalance);
-
-    const auto* parcel = parcels.findParcel(parcelId);
-    ASSERT_NE(parcel, nullptr);
-    EXPECT_EQ(parcel->senderUsername(), "alice");
-    EXPECT_EQ(parcel->receiverUsername(), "bob");
-    EXPECT_EQ(parcel->description(), "documents");
-    EXPECT_EQ(parcel->status(), ParcelStatus::WaitingForSign);
-
-    const UserRepository reloadedUsers(storage);
-    AdminRepository reloadedAdmins(storage);
-    const ParcelRepository reloadedParcels(storage);
-
-    ASSERT_NE(reloadedUsers.findUser("alice"), nullptr);
-    EXPECT_EQ(reloadedUsers.findUser("alice")->account().balance().raw_value(),
-              expectedBalance);
-    EXPECT_EQ(reloadedAdmins.getAdmin().account().balance().raw_value(),
-              expectedBalance);
-    EXPECT_NE(reloadedParcels.findParcel(parcelId), nullptr);
-}
-
-TEST(ParcelServiceTest,
-     SendParcelRejectsInsufficientBalanceWithoutSideEffects) {
-    const TempDirectory tempDir;
-    const FileStorage storage(tempDir.path());
-    UserRepository users(storage);
-    AdminRepository admins(storage);
-    ParcelRepository parcels(storage);
-    ParcelService service(users, admins, parcels);
-
-    users.createUser(makeUser("alice", 10.0));
-    users.createUser(makeUser("bob", 0.0));
-
-    const auto [parcelId, error] =
-        service.sendParcel("alice", "bob", "documents");
-
-    EXPECT_EQ(error, ParcelServiceError::InsufficientBalance);
-    EXPECT_TRUE(parcelId.empty());
-
-    ASSERT_NE(users.findUser("alice"), nullptr);
-    EXPECT_EQ(users.findUser("alice")->account().balance().raw_value(),
-              Money::from_double(10.0).raw_value());
-    EXPECT_EQ(admins.getAdmin().account().balance().raw_value(),
-              Money::from_double(0.0).raw_value());
-    EXPECT_TRUE(parcels.listAll().empty());
-}
-
 TEST(ParcelServiceTest, SignParcelUpdatesStatusForTheReceiver) {
     const TempDirectory tempDir;
     const FileStorage storage(tempDir.path());
     UserRepository users(storage);
     AdminRepository admins(storage);
     ParcelRepository parcels(storage);
-    ParcelService service(users, admins, parcels);
+    CourierRepository couriers(storage);
+    ParcelService service(users, admins, parcels, couriers);
 
     users.createUser(makeUser("alice", 30.0));
     users.createUser(makeUser("bob", 0.0));
     parcels.createParcel(
-        makeWaitingParcel("P-1001", "alice", "bob", "1000"));
+        makeWaitingForSignParcel("P-1001", "alice", "bob", "1000"));
 
     EXPECT_EQ(service.signParcel("bob", "P-1001"), ParcelServiceError::Nil);
 
@@ -202,13 +169,14 @@ TEST(ParcelServiceTest, SignParcelRejectsWrongReceiverAndMissingParcel) {
     UserRepository users(storage);
     AdminRepository admins(storage);
     ParcelRepository parcels(storage);
-    ParcelService service(users, admins, parcels);
+    CourierRepository couriers(storage);
+    ParcelService service(users, admins, parcels, couriers);
 
     users.createUser(makeUser("alice", 30.0));
     users.createUser(makeUser("bob", 0.0));
     users.createUser(makeUser("carol", 0.0));
     parcels.createParcel(
-        makeWaitingParcel("P-1001", "alice", "bob", "1000"));
+        makeWaitingForSignParcel("P-1001", "alice", "bob", "1000"));
 
     EXPECT_EQ(service.signParcel("carol", "P-1001"),
               ParcelServiceError::NotReceiver);
@@ -227,7 +195,8 @@ TEST(ParcelServiceTest, QueryUserParcelsRespectsViewAndQuery) {
     UserRepository users(storage);
     AdminRepository admins(storage);
     ParcelRepository parcels(storage);
-    ParcelService service(users, admins, parcels);
+    CourierRepository couriers(storage);
+    ParcelService service(users, admins, parcels, couriers);
 
     users.createUser(makeUser("alice", 30.0));
     users.createUser(makeUser("bob", 0.0));
@@ -239,7 +208,7 @@ TEST(ParcelServiceTest, QueryUserParcelsRespectsViewAndQuery) {
     parcels.createParcel(
         makeSignedParcel("P-1002", "alice", "carol", "2000", "2100"));
     parcels.createParcel(
-        makeWaitingParcel("P-1003", "dave", "alice", "3000"));
+        makeWaitingForSignParcel("P-1003", "dave", "alice", "3000"));
     parcels.createParcel(
         makeSignedParcel("P-1004", "bob", "alice", "4000", "4100"));
 
@@ -272,7 +241,8 @@ TEST(ParcelServiceTest, QueryAdminParcelsFiltersAcrossAllParcels) {
     UserRepository users(storage);
     AdminRepository admins(storage);
     ParcelRepository parcels(storage);
-    ParcelService service(users, admins, parcels);
+    CourierRepository couriers(storage);
+    ParcelService service(users, admins, parcels, couriers);
 
     users.createUser(makeUser("alice", 30.0));
     users.createUser(makeUser("bob", 0.0));
@@ -298,6 +268,163 @@ TEST(ParcelServiceTest, QueryAdminParcelsFiltersAcrossAllParcels) {
 
     EXPECT_EQ(sortedParcelIds(service.queryAdminParcels(query)),
               (std::vector<std::string>{"P-1003"}));
+}
+
+TEST(ParcelServiceTest,
+     SendParcelUsesItemPriceAndCreatesWaitingForPickupParcel) {
+    const TempDirectory tempDir;
+    const FileStorage storage(tempDir.path());
+    UserRepository users(storage);
+    AdminRepository admins(storage);
+    ParcelRepository parcels(storage);
+    CourierRepository couriers(storage);
+    ParcelService service(users, admins, parcels, couriers);
+
+    users.createUser(makeUser("alice", 30.0));
+    users.createUser(makeUser("bob", 0.0));
+    const FragileItem item(3.0);
+
+    const auto [parcelId, error] =
+        service.sendParcel("alice", "bob", "glass cups", item);
+
+    EXPECT_EQ(error, ParcelServiceError::Nil);
+    EXPECT_FALSE(parcelId.empty());
+
+    ASSERT_NE(users.findUser("alice"), nullptr);
+    EXPECT_EQ(users.findUser("alice")->account().balance().raw_value(),
+              Money::from_double(6.0).raw_value());
+    EXPECT_EQ(admins.getAdmin().account().balance().raw_value(),
+              Money::from_double(24.0).raw_value());
+
+    const auto* parcel = parcels.findParcel(parcelId);
+    ASSERT_NE(parcel, nullptr);
+    EXPECT_EQ(parcel->status(), ParcelStatus::WaitingForPickup);
+    EXPECT_EQ(parcel->itemType(), exf::ParcelItemType::Fragile);
+    EXPECT_DOUBLE_EQ(parcel->itemAmount(), 3.0);
+    EXPECT_EQ(parcel->fee().raw_value(), Money::from_double(24.0).raw_value());
+}
+
+TEST(ParcelServiceTest, AssignCourierRecordsCourierForWaitingPickupParcel) {
+    const TempDirectory tempDir;
+    const FileStorage storage(tempDir.path());
+    UserRepository users(storage);
+    AdminRepository admins(storage);
+    ParcelRepository parcels(storage);
+    CourierRepository couriers(storage);
+    ParcelService service(users, admins, parcels, couriers);
+
+    users.createUser(makeUser("alice", 30.0));
+    users.createUser(makeUser("bob", 0.0));
+    couriers.createCourier(makeCourier("c01"));
+    const BookItem item(5);
+    const auto [parcelId, sendError] =
+        service.sendParcel("alice", "bob", "books", item);
+    ASSERT_EQ(sendError, ParcelServiceError::Nil);
+
+    EXPECT_EQ(service.assignCourier(parcelId, "c01"),
+              ParcelServiceError::Nil);
+
+    const auto* parcel = parcels.findParcel(parcelId);
+    ASSERT_NE(parcel, nullptr);
+    EXPECT_EQ(parcel->courierUsername(), "c01");
+    EXPECT_EQ(parcel->status(), ParcelStatus::WaitingForPickup);
+}
+
+TEST(ParcelServiceTest,
+     PickupParcelMovesToWaitingForSignAndPaysHalfFeeToCourier) {
+    const TempDirectory tempDir;
+    const FileStorage storage(tempDir.path());
+    UserRepository users(storage);
+    AdminRepository admins(storage);
+    ParcelRepository parcels(storage);
+    CourierRepository couriers(storage);
+    ParcelService service(users, admins, parcels, couriers);
+
+    users.createUser(makeUser("alice", 30.0));
+    users.createUser(makeUser("bob", 0.0));
+    couriers.createCourier(makeCourier("c01"));
+    const FragileItem item(3.0);
+    const auto [parcelId, sendError] =
+        service.sendParcel("alice", "bob", "glass cups", item);
+    ASSERT_EQ(sendError, ParcelServiceError::Nil);
+    ASSERT_EQ(service.assignCourier(parcelId, "c01"),
+              ParcelServiceError::Nil);
+
+    EXPECT_EQ(service.pickupParcel("c01", parcelId), ParcelServiceError::Nil);
+
+    const auto* parcel = parcels.findParcel(parcelId);
+    ASSERT_NE(parcel, nullptr);
+    EXPECT_EQ(parcel->status(), ParcelStatus::WaitingForSign);
+    EXPECT_FALSE(parcel->pickedAt().empty());
+    EXPECT_EQ(admins.getAdmin().account().balance().raw_value(),
+              Money::from_double(12.0).raw_value());
+    ASSERT_NE(couriers.findCourier("c01"), nullptr);
+    EXPECT_EQ(couriers.findCourier("c01")->account().balance().raw_value(),
+              Money::from_double(12.0).raw_value());
+}
+
+TEST(ParcelServiceTest,
+     QueryCourierParcelsFiltersByCourierViewAndParcelQuery) {
+    const TempDirectory tempDir;
+    const FileStorage storage(tempDir.path());
+    UserRepository users(storage);
+    AdminRepository admins(storage);
+    ParcelRepository parcels(storage);
+    CourierRepository couriers(storage);
+    ParcelService service(users, admins, parcels, couriers);
+
+    users.createUser(makeUser("alice", 100.0));
+    users.createUser(makeUser("bob", 0.0));
+    users.createUser(makeUser("carol", 0.0));
+    couriers.createCourier(makeCourier("c01"));
+    couriers.createCourier(makeCourier("c02"));
+
+    const BookItem books(3);
+    const FragileItem fragile(2.0);
+    const auto [firstId, firstError] =
+        service.sendParcel("alice", "bob", "books", books);
+    ASSERT_EQ(firstError, ParcelServiceError::Nil);
+    ASSERT_EQ(service.assignCourier(firstId, "c01"), ParcelServiceError::Nil);
+
+    const auto [secondId, secondError] =
+        service.sendParcel("alice", "carol", "glass", fragile);
+    ASSERT_EQ(secondError, ParcelServiceError::Nil);
+    ASSERT_EQ(service.assignCourier(secondId, "c02"), ParcelServiceError::Nil);
+
+    ParcelQuery query;
+    query.receiverUsername = "bob";
+
+    const auto waitingForC01 = service.queryCourierParcels(
+        "c01", CourierParcelView::AssignedWaitingForPickup, query);
+    ASSERT_EQ(waitingForC01.size(), 1U);
+    EXPECT_EQ(waitingForC01[0].id(), firstId);
+
+    ASSERT_EQ(service.pickupParcel("c01", firstId), ParcelServiceError::Nil);
+    query = ParcelQuery{};
+    const auto pickedByC01 = service.queryCourierParcels(
+        "c01", CourierParcelView::PickedUpOrDelivered, query);
+    ASSERT_EQ(pickedByC01.size(), 1U);
+    EXPECT_EQ(pickedByC01[0].id(), firstId);
+}
+
+TEST(ParcelServiceTest, SignParcelRejectsParcelBeforePickup) {
+    const TempDirectory tempDir;
+    const FileStorage storage(tempDir.path());
+    UserRepository users(storage);
+    AdminRepository admins(storage);
+    ParcelRepository parcels(storage);
+    CourierRepository couriers(storage);
+    ParcelService service(users, admins, parcels, couriers);
+
+    users.createUser(makeUser("alice", 30.0));
+    users.createUser(makeUser("bob", 0.0));
+    const BookItem item(2);
+    const auto [parcelId, sendError] =
+        service.sendParcel("alice", "bob", "books", item);
+    ASSERT_EQ(sendError, ParcelServiceError::Nil);
+
+    EXPECT_EQ(service.signParcel("bob", parcelId),
+              ParcelServiceError::NotWaitingForSign);
 }
 
 }  // namespace

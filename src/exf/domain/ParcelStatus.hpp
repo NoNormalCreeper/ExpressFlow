@@ -3,7 +3,7 @@
 namespace exf {
 
 /**
- * ParcelStatus 列出阶段 1 需要的两种包裹状态。
+ * ParcelStatus 列出阶段 2 快递流转需要的包裹状态。
  */
 enum class ParcelStatus {
     /** 等待收件人签收。 */

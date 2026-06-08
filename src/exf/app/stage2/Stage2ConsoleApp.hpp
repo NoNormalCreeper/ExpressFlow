@@ -3,6 +3,7 @@
 #include <filesystem>
 
 #include "exf/repository/AdminRepository.hpp"
+#include "exf/repository/CourierRepository.hpp"
 #include "exf/repository/ParcelRepository.hpp"
 #include "exf/repository/UserRepository.hpp"
 #include "exf/storage/FileStorage.hpp"
@@ -33,6 +34,9 @@ class Stage2ConsoleApp {
 
     /** 阶段 2 复用管理员仓储。 */
     AdminRepository adminRepository_;
+
+    /** 阶段 2 快递员仓储。 */
+    CourierRepository courierRepository_;
 
     /** 阶段 2 复用并扩展包裹仓储。 */
     ParcelRepository parcelRepository_;

@@ -1,4 +1,5 @@
 #include "exf/domain/Parcel.hpp"
+#include "exf/domain/ParcelItemType.hpp"
 #include "exf/domain/ParcelStatus.hpp"
 #include "exf/repository/ParcelRepository.hpp"
 #include "exf/storage/FileStorage.hpp"
@@ -18,6 +19,7 @@ namespace {
 
 using exf::FileStorage;
 using exf::Parcel;
+using exf::ParcelItemType;
 using exf::ParcelRecordCodec;
 using exf::ParcelRepository;
 using exf::ParcelStatus;
@@ -45,13 +47,32 @@ class TempDirectory {
     std::filesystem::path path_;
 };
 
-Parcel makeWaitingParcel(std::string id,
-                         std::string sender,
-                         std::string receiver,
-                         std::string description = "documents") {
-    return Parcel::createNew(std::move(id), std::move(sender),
-                             std::move(receiver), std::move(description),
-                             "2026-05-23 10:00:00", Money::from_double(15.0));
+Parcel makeWaitingForPickupParcel(std::string id,
+                                  std::string sender,
+                                  std::string receiver,
+                                  std::string description = "documents") {
+    return Parcel::createWaitingForPickup(
+        std::move(id),
+        std::move(sender),
+        std::move(receiver),
+        std::move(description),
+        "2026-05-23 10:00:00",
+        Money::from_double(15.0),
+        ParcelItemType::Standard,
+        3.0);
+}
+
+Parcel makeWaitingForSignParcel(std::string id,
+                                std::string sender,
+                                std::string receiver,
+                                std::string description = "documents") {
+    Parcel parcel = makeWaitingForPickupParcel(std::move(id),
+                                               std::move(sender),
+                                               std::move(receiver),
+                                               std::move(description));
+    parcel.assignCourier("c01");
+    parcel.markPickedUp("2026-05-23 11:00:00");
+    return parcel;
 }
 
 Parcel makeSignedParcel(std::string id,
@@ -79,7 +100,7 @@ TEST(ParcelRepositoryTest, LoadsExistingParcelsFromStorageOnConstruction) {
     storage.writeLines("parcels.txt",
                        {
                            ParcelRecordCodec::encode(
-                               makeWaitingParcel("P-1001", "alice", "bob")),
+                               makeWaitingForPickupParcel("P-1001", "alice", "bob")),
                            ParcelRecordCodec::encode(
                                makeSignedParcel("P-1002", "carol", "bob")),
                        });
@@ -90,7 +111,7 @@ TEST(ParcelRepositoryTest, LoadsExistingParcelsFromStorageOnConstruction) {
     ASSERT_NE(parcel, nullptr);
     EXPECT_EQ(parcel->senderUsername(), "alice");
     EXPECT_EQ(parcel->receiverUsername(), "bob");
-    EXPECT_EQ(parcel->status(), ParcelStatus::WaitingForSign);
+    EXPECT_EQ(parcel->status(), ParcelStatus::WaitingForPickup);
     EXPECT_EQ(repository.listAll().size(), 2U);
 }
 
@@ -99,7 +120,7 @@ TEST(ParcelRepositoryTest, CreatesParcelsAndPersistsThemToStorage) {
     const FileStorage storage(tempDir.path());
     ParcelRepository repository(storage);
 
-    repository.createParcel(makeWaitingParcel("P-1001", "alice", "bob"));
+    repository.createParcel(makeWaitingForPickupParcel("P-1001", "alice", "bob"));
 
     const Parcel* parcel = repository.findParcel("P-1001");
     ASSERT_NE(parcel, nullptr);
@@ -118,7 +139,7 @@ TEST(ParcelRepositoryTest, UpdatesParcelsAndPersistsTheReplacement) {
     const TempDirectory tempDir;
     const FileStorage storage(tempDir.path());
     ParcelRepository repository(storage);
-    repository.createParcel(makeWaitingParcel("P-1001", "alice", "bob"));
+    repository.createParcel(makeWaitingForPickupParcel("P-1001", "alice", "bob"));
 
     Parcel signedParcel =
         makeSignedParcel("P-1001", "alice", "bob", "2026-05-23 13:00:00");
@@ -135,8 +156,8 @@ TEST(ParcelRepositoryTest, ListsParcelsByParticipantsAndWaitingReceiver) {
     const TempDirectory tempDir;
     const FileStorage storage(tempDir.path());
     ParcelRepository repository(storage);
-    repository.createParcel(makeWaitingParcel("P-1001", "alice", "bob"));
-    repository.createParcel(makeWaitingParcel("P-1002", "alice", "carol"));
+    repository.createParcel(makeWaitingForSignParcel("P-1001", "alice", "bob"));
+    repository.createParcel(makeWaitingForPickupParcel("P-1002", "alice", "carol"));
     repository.createParcel(makeSignedParcel("P-1003", "dave", "bob"));
 
     const auto sentByAlice = repository.listBySender("alice");

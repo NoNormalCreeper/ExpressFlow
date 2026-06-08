@@ -36,22 +36,6 @@ Parcel::Parcel(std::string id,
       pickedAt_(std::move(pickedAt)),
       status_(status) {}
 
-Parcel Parcel::createNew(std::string id,
-                         std::string senderUsername,
-                         std::string receiverUsername,
-                         std::string description,
-                         std::string sentAt,
-                         util::Money fee) {
-    return {std::move(id),
-            std::move(senderUsername),
-            std::move(receiverUsername),
-            std::move(description),
-            std::move(sentAt),
-            "",
-            std::move(fee),
-            ParcelStatus::WaitingForSign};
-}
-
 Parcel Parcel::createWaitingForPickup(std::string id,
                                       std::string senderUsername,
                                       std::string receiverUsername,

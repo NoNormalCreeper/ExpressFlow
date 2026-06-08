@@ -18,9 +18,10 @@ using exf::ParcelStatus;
 using exf::util::Money;
 
 TEST(ParcelRecordCodecTest, EncodesAndDecodesWaitingParcelWithEscapedFields) {
-    const Parcel parcel = Parcel::createNew(
+    const Parcel parcel = Parcel::createWaitingForPickup(
         "P|1001", R"(alice\sender)", "bob|receiver", R"(fragile | glass\ware)",
-        "2026-05-23 10:00:00", Money::from_double(15.75));
+        "2026-05-23 10:00:00", Money::from_double(15.75),
+        ParcelItemType::Fragile, 1.5);
 
     const std::string encoded = ParcelRecordCodec::encode(parcel);
     const Parcel decoded = ParcelRecordCodec::decode(encoded);
@@ -32,7 +33,9 @@ TEST(ParcelRecordCodecTest, EncodesAndDecodesWaitingParcelWithEscapedFields) {
     EXPECT_EQ(decoded.sentAt(), parcel.sentAt());
     EXPECT_EQ(decoded.receivedAt(), "");
     EXPECT_EQ(decoded.fee().raw_value(), parcel.fee().raw_value());
-    EXPECT_EQ(decoded.status(), ParcelStatus::WaitingForSign);
+    EXPECT_EQ(decoded.status(), ParcelStatus::WaitingForPickup);
+    EXPECT_EQ(decoded.itemType(), ParcelItemType::Fragile);
+    EXPECT_DOUBLE_EQ(decoded.itemAmount(), 1.5);
 }
 
 TEST(ParcelRecordCodecTest, EncodesAndDecodesSignedParcelWithReceivedTime) {
