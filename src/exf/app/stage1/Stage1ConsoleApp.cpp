@@ -477,6 +477,8 @@ std::string Stage1ConsoleApp::parcelStatusText(ParcelStatus status) {
             return "待签收";
         case ParcelStatus::Signed:
             return "已签收";
+        case ParcelStatus::WaitingForPickup:
+            return "待揽收";
     }
 
     return "未知";

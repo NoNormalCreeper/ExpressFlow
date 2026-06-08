@@ -7,10 +7,13 @@ namespace exf {
  */
 enum class ParcelStatus {
     /** 等待收件人签收。 */
-    WaitingForSign,
+    WaitingForSign = 0,
 
     /** 收件人已签收。 */
-    Signed
+    Signed = 1,
+
+    /** 等待快递员揽收。 */
+    WaitingForPickup = 2
 };
 
 }  // namespace exf

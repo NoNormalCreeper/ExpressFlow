@@ -1,5 +1,6 @@
 #include "exf/storage/RecordCodec.hpp"
 
+#include "exf/domain/ParcelItemType.hpp"
 #include "exf/domain/User.hpp"
 
 #include <stdexcept>
@@ -102,20 +103,34 @@ std::string ParcelRecordCodec::encode(const Parcel& parcel) {
         parcel.sentAt(),                                   // 寄件时间
         parcel.receivedAt(),                               // 签收时间
         exf::util::to_string(parcel.fee()),                // 运费
-        std::to_string(static_cast<int>(parcel.status()))  // 包裹状态
+        std::to_string(static_cast<int>(parcel.status())), // 包裹状态
+        std::to_string(static_cast<int>(parcel.itemType())),
+        std::to_string(parcel.itemAmount()),
+        parcel.courierUsername(),
+        parcel.pickedAt()
     };
     return join(fields);
 }
 
 Parcel ParcelRecordCodec::decode(std::string_view line) {
     const auto fields = split(line);
-    if (fields.size() != 8) {
+    if (fields.size() != 8 && fields.size() != 12) {
         throw std::runtime_error("Invalid parcel record: " + std::string(line));
+    }
+
+    if (fields.size() == 8) {
+        return Parcel(fields[0], fields[1], fields[2], fields[3], fields[4],
+                      fields[5], util::Money::from_string(fields[6]),
+                      static_cast<ParcelStatus>(std::stoi(fields[7])));
     }
 
     return Parcel(fields[0], fields[1], fields[2], fields[3], fields[4],
                   fields[5], util::Money::from_string(fields[6]),
-                  static_cast<ParcelStatus>(std::stoi(fields[7])));
+                  static_cast<ParcelStatus>(std::stoi(fields[7])),
+                  static_cast<ParcelItemType>(std::stoi(fields[8])),
+                  std::stod(fields[9]),
+                  fields[10],
+                  fields[11]);
 }
 
 std::string AdminRecordCodec::encode(const Admin& admin) {

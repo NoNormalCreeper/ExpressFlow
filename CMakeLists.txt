@@ -51,6 +51,13 @@ add_executable(stage1
 
 target_link_libraries(stage1 PRIVATE core)
 
+add_executable(stage2
+    apps/stage2/main.cpp
+    src/exf/app/stage2/Stage2ConsoleApp.cpp
+)
+
+target_link_libraries(stage2 PRIVATE core)
+
 add_custom_target(run
     COMMAND $<TARGET_FILE:stage1>
     DEPENDS stage1
