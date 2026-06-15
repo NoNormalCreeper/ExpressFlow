@@ -1,2 +1,12 @@
 build/
 data/
+.idea/.gitignore
+.idea/editor.xml
+.idea/ExpressFlow.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/codeStyles/codeStyleConfig.xml
+.idea/codeStyles/Project.xml
+build-clang-libcxx/
+cmake-build-debug/
