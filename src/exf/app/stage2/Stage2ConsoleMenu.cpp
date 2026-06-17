@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "exf/app/console/ConsoleInput.hpp"
+#include "exf/app/console/ConsoleMenu.hpp"
 
 namespace exf {
 
@@ -11,16 +12,12 @@ void Stage2ConsoleMenu::printMenu(
     std::string_view title,
     const std::vector<std::string>& options,
     int startIndex) {
-    std::cout << title << '\n';
-    for (size_t i = 0; i < options.size(); ++i) {
-        std::cout << "  " << (startIndex + i) << ". " << options[i] << '\n';
-    }
+    ConsoleMenu::print(title, options, startIndex);
 }
 
 void Stage2ConsoleMenu::printSeparator(std::string_view separator,
                                        int length) {
-    std::cout << std::string(length, separator.empty() ? '-' : separator[0])
-              << '\n';
+    ConsoleMenu::printSeparator(separator, length);
 }
 
 const char* Stage2ConsoleMenu::roleText(Stage2Role role) {

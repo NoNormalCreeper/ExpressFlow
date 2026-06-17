@@ -1,14 +1,13 @@
 #include "exf/app/stage2/Stage2ConsoleApp.hpp"
 
-#include <algorithm>
 #include <exception>
 #include <iostream>
 #include <regex>
-#include <sstream>
 #include <utility>
 
+#include "exf/app/console/ConsoleDisplay.hpp"
 #include "exf/app/console/ConsoleInput.hpp"
-#include "exf/util/TimeUtil.hpp"
+#include "exf/app/console/ConsoleSelection.hpp"
 
 namespace exf {
 
@@ -575,149 +574,20 @@ int Stage2ConsoleApp::promptPositiveInt(std::string_view label) {
 std::optional<std::vector<size_t>> Stage2ConsoleApp::parseSelectionIndices(
     std::string_view input,
     size_t maxCount) {
-    std::string normalized(input);
-    std::replace(normalized.begin(), normalized.end(), ',', ' ');
-
-    std::istringstream stream(normalized);
-    std::vector<std::string> tokens;
-    std::string token;
-    while (stream >> token) {
-        tokens.push_back(token);
-    }
-
-    if (tokens.empty()) {
-        return std::vector<size_t>{};
-    }
-    if (tokens.size() == 1 && tokens.front() == "all") {
-        std::vector<size_t> all;
-        all.reserve(maxCount);
-        for (size_t i = 0; i < maxCount; ++i) {
-            all.push_back(i);
-        }
-        return all;
-    }
-
-    std::vector<size_t> indices;
-    std::vector<bool> used(maxCount, false);
-    for (const auto& item : tokens) {
-        size_t parsedLength = 0;
-        int parsedIndex = 0;
-        try {
-            parsedIndex = std::stoi(item, &parsedLength);
-        } catch (const std::exception&) {
-            return std::nullopt;
-        }
-
-        if (parsedLength != item.size() || parsedIndex <= 0 ||
-            static_cast<size_t>(parsedIndex) > maxCount) {
-            return std::nullopt;
-        }
-
-        const size_t zeroBasedIndex = static_cast<size_t>(parsedIndex - 1);
-        if (!used[zeroBasedIndex]) {
-            indices.push_back(zeroBasedIndex);
-            used[zeroBasedIndex] = true;
-        }
-    }
-
-    return indices;
-}
-
-std::string Stage2ConsoleApp::parcelStatusText(ParcelStatus status) {
-    switch (status) {
-        case ParcelStatus::WaitingForPickup:
-            return "待揽收";
-        case ParcelStatus::WaitingForSign:
-            return "待签收";
-        case ParcelStatus::Signed:
-            return "已签收";
-    }
-    return "未知";
-}
-
-std::string Stage2ConsoleApp::parcelItemTypeText(ParcelItemType itemType) {
-    switch (itemType) {
-        case ParcelItemType::Standard:
-            return "普通快递";
-        case ParcelItemType::Fragile:
-            return "易碎品";
-        case ParcelItemType::Book:
-            return "图书";
-    }
-    return "未知";
-}
-
-std::string Stage2ConsoleApp::formatTimestampForDisplay(
-    std::string_view timestamp) {
-    if (timestamp.empty()) {
-        return "-";
-    }
-    try {
-        return TimeUtil::formatTimestamp(timestamp);
-    } catch (const std::exception&) {
-        return std::string(timestamp);
-    }
+    return ConsoleSelection::parseSelectionIndices(input, maxCount);
 }
 
 void Stage2ConsoleApp::printUserList(const std::vector<User>& users) {
-    if (users.empty()) {
-        std::cout << "暂无注册用户。\n";
-        return;
-    }
-
-    std::cout << "共 " << users.size() << " 个用户：\n";
-    for (size_t i = 0; i < users.size(); ++i) {
-        const auto& user = users[i];
-        std::cout << "  [" << (i + 1) << "] " << user.username() << " | "
-                  << user.name() << " | " << user.phone() << " | "
-                  << user.address() << " | 余额: "
-                  << user.account().balance() << " 元\n";
-    }
+    ConsoleDisplay::printUsers(users);
 }
 
 void Stage2ConsoleApp::printCourierList(
     const std::vector<Courier>& couriers) {
-    if (couriers.empty()) {
-        std::cout << "暂无快递员。\n";
-        return;
-    }
-
-    std::cout << "共 " << couriers.size() << " 个快递员：\n";
-    for (size_t i = 0; i < couriers.size(); ++i) {
-        const auto& courier = couriers[i];
-        std::cout << "  [" << (i + 1) << "] " << courier.username() << " | "
-                  << courier.name() << " | " << courier.phone()
-                  << " | 余额: " << courier.account().balance() << " 元\n";
-    }
+    ConsoleDisplay::printCouriers(couriers);
 }
 
 void Stage2ConsoleApp::printParcelList(const std::vector<Parcel>& parcels) {
-    if (parcels.empty()) {
-        std::cout << "没有符合条件的快递。\n";
-        return;
-    }
-
-    std::cout << "共 " << parcels.size() << " 件快递：\n";
-    for (size_t i = 0; i < parcels.size(); ++i) {
-        const auto& parcel = parcels[i];
-        std::cout << "  [" << (i + 1) << "] " << parcel.id() << " | "
-                  << parcel.senderUsername() << " -> "
-                  << parcel.receiverUsername() << " | "
-                  << parcelStatusText(parcel.status()) << " | "
-                  << parcelItemTypeText(parcel.itemType()) << "("
-                  << parcel.itemAmount() << ")"
-                  << " | 快递员: "
-                  << (parcel.courierUsername().empty()
-                          ? "-"
-                          : parcel.courierUsername())
-                  << " | 寄件: " << formatTimestampForDisplay(parcel.sentAt())
-                  << " | 揽收: "
-                  << formatTimestampForDisplay(parcel.pickedAt())
-                  << " | 签收: "
-                  << formatTimestampForDisplay(parcel.receivedAt())
-                  << " | 运费: " << parcel.fee() << " 元 | "
-                  << parcel.description() << '\n';
-    }
+    ConsoleDisplay::printParcels(parcels);
 }
 
 void Stage2ConsoleApp::printParcelServiceError(ParcelServiceError error) {

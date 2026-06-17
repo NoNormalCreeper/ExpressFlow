@@ -109,9 +109,6 @@ class Stage2ConsoleApp {
     static std::optional<std::vector<size_t>> parseSelectionIndices(
         std::string_view input,
         size_t maxCount);
-    static std::string parcelStatusText(ParcelStatus status);
-    static std::string parcelItemTypeText(ParcelItemType itemType);
-    static std::string formatTimestampForDisplay(std::string_view timestamp);
     static void printUserList(const std::vector<User>& users);
     static void printCourierList(const std::vector<Courier>& couriers);
     static void printParcelList(const std::vector<Parcel>& parcels);
