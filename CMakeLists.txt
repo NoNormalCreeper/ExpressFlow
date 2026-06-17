@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.20)
 project(ExpressFlow LANGUAGES CXX)
 
 include(FetchContent)
+find_package(Threads REQUIRED)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 20)
@@ -46,14 +47,55 @@ add_library(core STATIC
 target_include_directories(core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_compile_features(core PUBLIC cxx_std_20)
 
+set(STAGE3_PROTOCOL_SOURCES
+    src/exf/app/stage3/Stage3Role.cpp
+    src/exf/app/stage3/Stage3Protocol.cpp
+    src/exf/app/stage3/Stage3SessionManager.cpp
+    src/exf/app/stage3/Stage3RequestDispatcher.cpp
+)
+
+set(STAGE3_NET_SOURCES
+    src/exf/net/TcpConnection.cpp
+    src/exf/net/TcpClient.cpp
+    src/exf/net/TcpServer.cpp
+)
+
 add_executable(stage2
     apps/stage2/main.cpp
+    src/exf/app/console/ConsoleDisplay.cpp
+    src/exf/app/console/ConsoleMenu.cpp
     src/exf/app/console/ConsoleInput.cpp
+    src/exf/app/console/ConsoleSelection.cpp
     src/exf/app/stage2/Stage2ConsoleMenu.cpp
     src/exf/app/stage2/Stage2ConsoleApp.cpp
 )
 
 target_link_libraries(stage2 PRIVATE core)
+
+add_executable(stage3_server
+    apps/stage3_server/main.cpp
+    src/exf/app/stage3/Stage3ServerApp.cpp
+    ${STAGE3_PROTOCOL_SOURCES}
+    ${STAGE3_NET_SOURCES}
+)
+
+target_link_libraries(stage3_server PRIVATE core Threads::Threads)
+
+add_executable(stage3_client
+    apps/stage3_client/main.cpp
+    src/exf/app/console/ConsoleDisplay.cpp
+    src/exf/app/console/ConsoleMenu.cpp
+    src/exf/app/console/ConsoleInput.cpp
+    src/exf/app/console/ConsoleSelection.cpp
+    src/exf/app/stage3/Stage3ClientApp.cpp
+    src/exf/app/stage3/Stage3ClientService.cpp
+    src/exf/app/stage3/Stage3Role.cpp
+    src/exf/app/stage3/Stage3Protocol.cpp
+    src/exf/net/TcpConnection.cpp
+    src/exf/net/TcpClient.cpp
+)
+
+target_link_libraries(stage3_client PRIVATE core)
 
 add_custom_target(run
     COMMAND $<TARGET_FILE:stage2>
@@ -99,9 +141,13 @@ else()
 endif()
 
 add_executable(unit_tests
+    src/exf/app/console/ConsoleDisplay.cpp
+    src/exf/app/console/ConsoleMenu.cpp
     src/exf/app/console/ConsoleInput.cpp
+    src/exf/app/console/ConsoleSelection.cpp
     src/exf/app/stage2/Stage2ConsoleApp.cpp
     src/exf/app/stage2/Stage2ConsoleMenu.cpp
+    ${STAGE3_PROTOCOL_SOURCES}
     tests/domain/AccountTest.cpp
     tests/domain/CourierTest.cpp
     tests/domain/ItemTest.cpp
@@ -114,7 +160,12 @@ add_executable(unit_tests
     tests/service/UserServiceTest.cpp
     tests/service/ParcelServiceTest.cpp
     tests/app/console/ConsoleInputTest.cpp
+    tests/app/console/ConsoleSelectionTest.cpp
     tests/app/stage2/Stage2ConsoleAppTest.cpp
+    tests/app/stage3/Stage3ProtocolTest.cpp
+    tests/app/stage3/Stage3SessionManagerTest.cpp
+    tests/app/stage3/Stage3RequestDispatcherTest.cpp
+    tests/net/TcpConnectionTest.cpp
     tests/storage/FileStorageTest.cpp
     tests/storage/CourierRecordCodecTest.cpp
     tests/storage/ParcelRecordCodecTest.cpp
@@ -122,6 +173,7 @@ add_executable(unit_tests
     tests/storage/UserRecordCodecTest.cpp
     tests/util/TimeUtilTest.cpp
 )
+target_sources(unit_tests PRIVATE src/exf/net/TcpConnection.cpp)
 target_link_libraries(unit_tests PRIVATE core ${EXPRESSFLOW_GTEST_MAIN})
 
 enable_testing()

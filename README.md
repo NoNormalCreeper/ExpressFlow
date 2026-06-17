@@ -1,6 +1,6 @@
 # ExpressFlow
 
-ExpressFlow 是《面向对象编程实践（C++）》期末作业“物流管理系统设计与实现”的阶段式实现。当前工作树面向题目二单机版开发；题目一版本保留在前序提交中。
+ExpressFlow 是《面向对象编程实践（C++）》期末作业“物流管理系统设计与实现”的阶段式实现。当前工作树在题目二单机版基础上加入题目三 C/S socket 网络版。
 
 ## 题目演进
 
@@ -10,10 +10,12 @@ ExpressFlow 是《面向对象编程实践（C++）》期末作业“物流管�
 
 ## 当前阶段
 
-当前题目二核心领域层和服务层已开始落地：
+当前核心领域层和服务层已落地，并提供单机版与网络版入口：
 
 - `core`：业务核心库，包含 `domain`、`service`、`repository`、`storage`、`util`。
 - `stage2`：题目二控制台入口，包含 `apps/stage2/main.cpp` 和 `src/exf/app/stage2/Stage2ConsoleApp`。
+- `stage3_server`：题目三服务端入口，监听 TCP 连接并调用现有 service。
+- `stage3_client`：题目三客户端入口，通过 socket 协议调用服务端。
 - `unit_tests`：单元测试目标，覆盖领域对象、仓储、服务、存储和主要控制台路径。
 
 `core` 不包含 `main()`，不包含 `app/`，不直接使用 `cin/cout`。控制台输入输出只放在应用入口层。
@@ -71,13 +73,29 @@ cmake -S . -B build -DCMAKE_CXX_COMPILER=/usr/bin/c++
 cmake --build build
 ```
 
-## 运行
+## 运行题目二单机版
 
 ```bash
 ./build/stage2
 ```
 
 Windows 环境下可运行生成的 `stage2.exe`。
+
+## 运行题目三网络版
+
+先启动服务端：
+
+```bash
+./build/stage3_server 127.0.0.1 18080 data_stage3
+```
+
+再在另一个终端启动客户端：
+
+```bash
+./build/stage3_client 127.0.0.1 18080
+```
+
+参数可以省略。服务端默认使用 `0.0.0.0 18080 data_stage3`，客户端默认连接 `127.0.0.1 18080`。
 
 ## 测试
 

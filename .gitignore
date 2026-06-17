@@ -1,5 +1,7 @@
 build/
 data/
+.vscode/
+data_stage3/probe_transcripts/
 .idea/.gitignore
 .idea/editor.xml
 .idea/ExpressFlow.iml
