@@ -69,4 +69,11 @@ TEST(FileStorageTest, CreatesConfiguredBasePathWhenWritingLines) {
     std::filesystem::remove_all(path, ignored);
 }
 
+TEST(FileStorageTest, MissingFileReadsAsEmpty) {
+    const TempDirectory tempDir;
+    const exf::FileStorage storage(tempDir.path());
+
+    EXPECT_TRUE(storage.readLines("missing.txt").empty());
+}
+
 }  // namespace

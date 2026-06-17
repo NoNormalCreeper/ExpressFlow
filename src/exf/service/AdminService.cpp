@@ -19,6 +19,16 @@ std::vector<User> AdminService::listUsers() const {
     return users_.listAll();
 }
 
+bool AdminService::loginAdmin(const std::string& username,
+                              const std::string& password) const {
+    if (admins_ == nullptr) {
+        return false;
+    }
+
+    const auto& admin = admins_->getAdmin();
+    return admin.username() == username && admin.password() == password;
+}
+
 util::Money AdminService::getBalance() const {
     if (admins_ == nullptr) {
         throw std::runtime_error("管理员仓储未配置，不符合约定，请检查调用");

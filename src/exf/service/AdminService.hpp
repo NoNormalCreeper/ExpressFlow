@@ -4,6 +4,7 @@
 #include "exf/repository/UserRepository.hpp"
 #include "exf/util/Money.hpp"
 
+#include <string>
 #include <vector>
 
 namespace exf {
@@ -28,6 +29,12 @@ class AdminService {
      * 返回当前所有注册用户，供管理员查看。
      */
     std::vector<User> listUsers() const;
+
+    /**
+     * 校验管理员登录。
+     */
+    bool loginAdmin(const std::string& username,
+                    const std::string& password) const;
 
     /**
      * 返回管理员账户余额。
