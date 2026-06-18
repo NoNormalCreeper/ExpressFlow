@@ -60,7 +60,7 @@ UserServiceError UserService::updatePassword(const std::string& username,
 
     return UserServiceError::Nil;
 }
-util::Money UserService::getBalance(const std::string_view username) const {
+util::Money UserService::getBalance(std::string_view username) const {
     auto user = users_.findUser(username);
     if (user == nullptr) {
         throw std::runtime_error("用户未找到，不符合约定，请检查调用");
@@ -69,7 +69,7 @@ util::Money UserService::getBalance(const std::string_view username) const {
     return user->account().balance();
 }
 
-UserAccountError UserService::topUpBalance(const std::string_view username,
+UserAccountError UserService::topUpBalance(std::string_view username,
                                            const util::Money& amount) {
     if (amount < util::Money(0)) {
         return UserAccountError::InvalidAmount;
@@ -88,7 +88,7 @@ UserAccountError UserService::topUpBalance(const std::string_view username,
     return UserAccountError::Nil;
 }
 
-UserAccountError UserService::payFromBalance(const std::string_view username,
+UserAccountError UserService::payFromBalance(std::string_view username,
                                              const util::Money& amount) {
     if (amount < util::Money(0)) {
         return UserAccountError::InvalidAmount;

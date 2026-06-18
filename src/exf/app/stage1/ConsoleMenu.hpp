@@ -20,10 +20,10 @@ using Context = struct Context {
 
 class ConsoleMenu {
    private:
-    static void printMenu(const std::string_view title,
+    static void printMenu(std::string_view title,
                           const std::vector<std::string>& options,
                           int startIndex = 1);
-    static void printSeparator(const std::string_view separator = "-",
+    static void printSeparator(std::string_view separator = "-",
                                int length = 20);
 
     static void printLoginStatus(const MainMenu::Context& ctx);

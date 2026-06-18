@@ -7,6 +7,7 @@
 
 namespace exf {
 
+// 打印带序号的菜单项。
 void Stage2ConsoleMenu::printMenu(
     std::string_view title,
     const std::vector<std::string>& options,
@@ -17,12 +18,14 @@ void Stage2ConsoleMenu::printMenu(
     }
 }
 
+// 打印分隔线。
 void Stage2ConsoleMenu::printSeparator(std::string_view separator,
                                        int length) {
     std::cout << std::string(length, separator.empty() ? '-' : separator[0])
               << '\n';
 }
 
+// 返回角色显示文本。
 const char* Stage2ConsoleMenu::roleText(Stage2Role role) {
     switch (role) {
         case Stage2Role::Guest:
@@ -37,6 +40,7 @@ const char* Stage2ConsoleMenu::roleText(Stage2Role role) {
     return "未知";
 }
 
+// 打印当前登录状态。
 void Stage2ConsoleMenu::printLoginStatus(const Stage2Context& ctx) {
     std::cout << "登录状态：";
     if (ctx.role == Stage2Role::Guest) {
@@ -48,6 +52,7 @@ void Stage2ConsoleMenu::printLoginStatus(const Stage2Context& ctx) {
     std::cout << '\n';
 }
 
+// 显示主菜单并返回选择。
 int Stage2ConsoleMenu::showMainMenu(const Stage2Context& ctx) {
     const std::vector<std::string> options = {
         "账号菜单",      "账户余额菜单", "用户快递菜单",
@@ -59,6 +64,7 @@ int Stage2ConsoleMenu::showMainMenu(const Stage2Context& ctx) {
     return ConsoleInput::promptChoice("请选择一个选项", 1, options.size());
 }
 
+// 显示账号菜单并返回选择。
 int Stage2ConsoleMenu::showAccountMenu(const Stage2Context& ctx) {
     const std::vector<std::string> options = {
         "用户注册", "用户登录", "快递员登录", "管理员登录",
@@ -70,6 +76,7 @@ int Stage2ConsoleMenu::showAccountMenu(const Stage2Context& ctx) {
     return ConsoleInput::promptChoice("请选择一个选项", 1, options.size());
 }
 
+// 显示余额菜单并返回选择。
 int Stage2ConsoleMenu::showBalanceMenu(const Stage2Context& ctx) {
     printSeparator();
     if (ctx.role == Stage2Role::Guest) {
@@ -87,6 +94,7 @@ int Stage2ConsoleMenu::showBalanceMenu(const Stage2Context& ctx) {
     return ConsoleInput::promptChoice("请选择一个选项", 1, options.size());
 }
 
+// 显示用户快递菜单并返回选择。
 int Stage2ConsoleMenu::showUserParcelMenu(const Stage2Context& ctx) {
     const std::vector<std::string> options = {"发送快递", "待签收并签收",
                                               "查询快递", "返回主菜单"};
@@ -101,6 +109,7 @@ int Stage2ConsoleMenu::showUserParcelMenu(const Stage2Context& ctx) {
     return ConsoleInput::promptChoice("请选择一个选项", 1, options.size());
 }
 
+// 显示快递员任务菜单并返回选择。
 int Stage2ConsoleMenu::showCourierTaskMenu(const Stage2Context& ctx) {
     const std::vector<std::string> options = {
         "查看待揽收任务", "揽收快递", "查询我的快递任务",
@@ -116,6 +125,7 @@ int Stage2ConsoleMenu::showCourierTaskMenu(const Stage2Context& ctx) {
     return ConsoleInput::promptChoice("请选择一个选项", 1, options.size());
 }
 
+// 显示管理员菜单并返回选择。
 int Stage2ConsoleMenu::showAdminMenu(const Stage2Context& ctx) {
     const std::vector<std::string> options = {
         "查看所有用户", "查看所有快递员", "添加快递员",

@@ -32,10 +32,10 @@ class UserRepository {
     bool isReady() const;
 
     // 下面的增删改查操作默认传入的用户名唯一，需要在服务层判断并处理重复用户名的情况。
-    const User* findUser(const std::string_view& username) const;
+    const User* findUser(std::string_view username) const;
     void createUser(const User& user);
-    void deleteUser(const std::string_view& username);
-    void updateUser(const std::string_view& username, const User& user);
+    void deleteUser(std::string_view username);
+    void updateUser(std::string_view username, const User& user);
     const std::vector<User>& listAll() const;
 
     // 在 repo 内部修改用户并保存；返回业务结果 + 是否修改。非 void 返回 optional<T>，void 返回 bool
@@ -68,7 +68,7 @@ class UserRepository {
         }
     }
 
-    bool userExists(const std::string_view& username) const {
+    bool userExists(std::string_view username) const {
         return findUser(username) != nullptr;
     }
 

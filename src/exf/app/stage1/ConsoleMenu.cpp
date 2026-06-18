@@ -7,7 +7,7 @@
 
 namespace exf {
 
-void ConsoleMenu::printMenu(const std::string_view title,
+void ConsoleMenu::printMenu(std::string_view title,
                             const std::vector<std::string>& options,
                             int startIndex) {
     std::cout << title << '\n';
@@ -16,7 +16,7 @@ void ConsoleMenu::printMenu(const std::string_view title,
     }
 }
 
-void ConsoleMenu::printSeparator(const std::string_view separator, int length) {
+void ConsoleMenu::printSeparator(std::string_view separator, int length) {
     std::cout << std::string(length, separator.empty() ? '-' : separator[0])
               << '\n';
 }

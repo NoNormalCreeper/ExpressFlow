@@ -33,7 +33,7 @@ class CourierRepository {
     /**
      * 按用户名查找快递员。
      */
-    const Courier* findCourier(const std::string_view& username) const;
+    const Courier* findCourier(std::string_view username) const;
 
     /**
      * 新增快递员并保存。
@@ -43,12 +43,12 @@ class CourierRepository {
     /**
      * 删除指定快递员并保存。
      */
-    void deleteCourier(const std::string_view& username);
+    void deleteCourier(std::string_view username);
 
     /**
      * 替换指定快递员并保存。
      */
-    void updateCourier(const std::string_view& username,
+    void updateCourier(std::string_view username,
                        const Courier& courier);
 
     /**
@@ -91,7 +91,7 @@ class CourierRepository {
     /**
      * 判断指定快递员是否存在。
      */
-    bool courierExists(const std::string_view& username) const;
+    bool courierExists(std::string_view username) const;
 
    private:
     /** 文件存储边界。 */

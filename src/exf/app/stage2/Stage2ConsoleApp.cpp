@@ -12,6 +12,7 @@
 
 namespace exf {
 
+// 创建阶段 2 控制台应用并装配仓储和服务。
 Stage2ConsoleApp::Stage2ConsoleApp(std::filesystem::path dataDir)
     : storage_(std::move(dataDir)),
       userRepository_(storage_),
@@ -26,6 +27,7 @@ Stage2ConsoleApp::Stage2ConsoleApp(std::filesystem::path dataDir)
                      parcelRepository_,
                      courierRepository_) {}
 
+// 处理用户注册流程。
 void Stage2ConsoleApp::handleUserRegister() {
     std::string username, name, phone, password, address;
 
@@ -57,6 +59,7 @@ void Stage2ConsoleApp::handleUserRegister() {
     }
 }
 
+// 处理用户登录流程并写入上下文。
 void Stage2ConsoleApp::handleUserLogin(Stage2Context& ctx) {
     const std::string username = ConsoleInput::promptNonEmpty("请输入用户名");
     const std::string password =
@@ -75,6 +78,7 @@ void Stage2ConsoleApp::handleUserLogin(Stage2Context& ctx) {
     }
 }
 
+// 处理快递员登录流程并写入上下文。
 void Stage2ConsoleApp::handleCourierLogin(Stage2Context& ctx) {
     const std::string username =
         ConsoleInput::promptNonEmpty("请输入快递员用户名");
@@ -94,6 +98,7 @@ void Stage2ConsoleApp::handleCourierLogin(Stage2Context& ctx) {
     }
 }
 
+// 处理管理员登录流程并写入上下文。
 void Stage2ConsoleApp::handleAdminLogin(Stage2Context& ctx) {
     const auto& admin = adminRepository_.getAdmin();
     const std::string username =
@@ -114,6 +119,7 @@ void Stage2ConsoleApp::handleAdminLogin(Stage2Context& ctx) {
     std::cout << "管理员登录成功！\n";
 }
 
+// 清空当前登录上下文。
 void Stage2ConsoleApp::handleLogout(Stage2Context& ctx) {
     if (ctx.role == Stage2Role::Guest) {
         std::cout << "当前尚未登录。\n";
@@ -125,6 +131,7 @@ void Stage2ConsoleApp::handleLogout(Stage2Context& ctx) {
     std::cout << "已退出登录。\n";
 }
 
+// 处理当前账号修改密码流程。
 void Stage2ConsoleApp::handleChangePassword(Stage2Context& ctx) {
     if (ctx.role != Stage2Role::User && ctx.role != Stage2Role::Courier) {
         std::cout << "请先使用用户或快递员身份登录。\n";
@@ -152,6 +159,7 @@ void Stage2ConsoleApp::handleChangePassword(Stage2Context& ctx) {
                                                   : "密码修改失败。\n");
 }
 
+// 查询当前账号余额。
 void Stage2ConsoleApp::handleGetBalance(const Stage2Context& ctx) {
     if (ctx.role == Stage2Role::User) {
         std::cout << "当前余额: " << userService_.getBalance(ctx.username)
@@ -166,6 +174,7 @@ void Stage2ConsoleApp::handleGetBalance(const Stage2Context& ctx) {
     }
 }
 
+// 处理当前用户充值流程。
 void Stage2ConsoleApp::handleTopUpBalance(const Stage2Context& ctx) {
     if (ctx.role != Stage2Role::User) {
         std::cout << "请先使用用户身份登录。\n";
@@ -184,6 +193,7 @@ void Stage2ConsoleApp::handleTopUpBalance(const Stage2Context& ctx) {
     }
 }
 
+// 处理用户寄件流程。
 void Stage2ConsoleApp::handleSendParcel(const Stage2Context& ctx) {
     if (ctx.role != Stage2Role::User) {
         std::cout << "请先使用用户身份登录。\n";
@@ -208,6 +218,7 @@ void Stage2ConsoleApp::handleSendParcel(const Stage2Context& ctx) {
     }
 }
 
+// 处理用户批量签收流程。
 void Stage2ConsoleApp::handleSignParcels(const Stage2Context& ctx) {
     if (ctx.role != Stage2Role::User) {
         std::cout << "请先使用用户身份登录。\n";
@@ -249,6 +260,7 @@ void Stage2ConsoleApp::handleSignParcels(const Stage2Context& ctx) {
     std::cout << "签收完成，共成功签收 " << successCount << " 件。\n";
 }
 
+// 处理用户快递查询流程。
 void Stage2ConsoleApp::handleQueryUserParcels(const Stage2Context& ctx) {
     if (ctx.role != Stage2Role::User) {
         std::cout << "请先使用用户身份登录。\n";
@@ -276,6 +288,7 @@ void Stage2ConsoleApp::handleQueryUserParcels(const Stage2Context& ctx) {
                                                     promptParcelQuery()));
 }
 
+// 查询当前快递员待揽收任务。
 void Stage2ConsoleApp::handleListWaitingPickupTasks(
     const Stage2Context& ctx) {
     if (ctx.role != Stage2Role::Courier) {
@@ -288,6 +301,7 @@ void Stage2ConsoleApp::handleListWaitingPickupTasks(
         ParcelQuery{}));
 }
 
+// 处理快递员批量揽收流程。
 void Stage2ConsoleApp::handlePickupParcels(const Stage2Context& ctx) {
     if (ctx.role != Stage2Role::Courier) {
         std::cout << "请先使用快递员身份登录。\n";
@@ -326,6 +340,7 @@ void Stage2ConsoleApp::handlePickupParcels(const Stage2Context& ctx) {
     std::cout << "揽收完成，共成功揽收 " << successCount << " 件。\n";
 }
 
+// 处理快递员任务查询流程。
 void Stage2ConsoleApp::handleQueryCourierParcels(const Stage2Context& ctx) {
     if (ctx.role != Stage2Role::Courier) {
         std::cout << "请先使用快递员身份登录。\n";
@@ -336,6 +351,7 @@ void Stage2ConsoleApp::handleQueryCourierParcels(const Stage2Context& ctx) {
         ctx.username, CourierParcelView::Related, promptCourierParcelQuery()));
 }
 
+// 查询当前快递员余额。
 void Stage2ConsoleApp::handleCourierBalance(const Stage2Context& ctx) {
     if (ctx.role != Stage2Role::Courier) {
         std::cout << "请先使用快递员身份登录。\n";
@@ -346,6 +362,7 @@ void Stage2ConsoleApp::handleCourierBalance(const Stage2Context& ctx) {
               << " 元。\n";
 }
 
+// 处理管理员查看用户列表流程。
 void Stage2ConsoleApp::handleListUsers(const Stage2Context& ctx) {
     if (ctx.role != Stage2Role::Admin) {
         std::cout << "请先使用管理员身份登录。\n";
@@ -354,6 +371,7 @@ void Stage2ConsoleApp::handleListUsers(const Stage2Context& ctx) {
     printUserList(adminService_.listUsers());
 }
 
+// 处理管理员查看快递员列表流程。
 void Stage2ConsoleApp::handleListCouriers(const Stage2Context& ctx) {
     if (ctx.role != Stage2Role::Admin) {
         std::cout << "请先使用管理员身份登录。\n";
@@ -362,6 +380,7 @@ void Stage2ConsoleApp::handleListCouriers(const Stage2Context& ctx) {
     printCourierList(courierService_.listCouriers());
 }
 
+// 处理管理员新增快递员流程。
 void Stage2ConsoleApp::handleAddCourier(const Stage2Context& ctx) {
     if (ctx.role != Stage2Role::Admin) {
         std::cout << "请先使用管理员身份登录。\n";
@@ -390,6 +409,7 @@ void Stage2ConsoleApp::handleAddCourier(const Stage2Context& ctx) {
     }
 }
 
+// 处理管理员删除快递员流程。
 void Stage2ConsoleApp::handleDeleteCourier(const Stage2Context& ctx) {
     if (ctx.role != Stage2Role::Admin) {
         std::cout << "请先使用管理员身份登录。\n";
@@ -404,6 +424,7 @@ void Stage2ConsoleApp::handleDeleteCourier(const Stage2Context& ctx) {
                                                   : "快递员不存在。\n");
 }
 
+// 处理管理员分配快递员流程。
 void Stage2ConsoleApp::handleAssignCourier(const Stage2Context& ctx) {
     if (ctx.role != Stage2Role::Admin) {
         std::cout << "请先使用管理员身份登录。\n";
@@ -435,6 +456,7 @@ void Stage2ConsoleApp::handleAssignCourier(const Stage2Context& ctx) {
     }
 }
 
+// 处理管理员快递查询流程。
 void Stage2ConsoleApp::handleQueryAdminParcels(const Stage2Context& ctx) {
     if (ctx.role != Stage2Role::Admin) {
         std::cout << "请先使用管理员身份登录。\n";
@@ -443,6 +465,7 @@ void Stage2ConsoleApp::handleQueryAdminParcels(const Stage2Context& ctx) {
     printParcelList(parcelService_.queryAdminParcels(promptAdminParcelQuery()));
 }
 
+// 处理管理员查询快递员任务流程。
 void Stage2ConsoleApp::handleQueryCourierTasksAsAdmin(
     const Stage2Context& ctx) {
     if (ctx.role != Stage2Role::Admin) {
@@ -456,6 +479,7 @@ void Stage2ConsoleApp::handleQueryCourierTasksAsAdmin(
         courierUsername, CourierParcelView::Related, promptCourierParcelQuery()));
 }
 
+// 提示输入通用快递查询条件。
 ParcelQuery Stage2ConsoleApp::promptParcelQuery() {
     ParcelQuery query;
     query.id = ConsoleInput::promptOptionalText("请输入快递单号（可留空）");
@@ -472,6 +496,7 @@ ParcelQuery Stage2ConsoleApp::promptParcelQuery() {
     return query;
 }
 
+// 提示输入管理员快递查询条件。
 ParcelQuery Stage2ConsoleApp::promptAdminParcelQuery() {
     ParcelQuery query = promptParcelQuery();
     query.courierUsername =
@@ -479,10 +504,12 @@ ParcelQuery Stage2ConsoleApp::promptAdminParcelQuery() {
     return query;
 }
 
+// 提示输入快递员任务查询条件。
 ParcelQuery Stage2ConsoleApp::promptCourierParcelQuery() {
     return promptParcelQuery();
 }
 
+// 提示输入可选快递状态。
 std::optional<ParcelStatus> Stage2ConsoleApp::promptOptionalParcelStatus(
     std::string_view label) {
     std::cout << label << '\n';
@@ -504,6 +531,7 @@ std::optional<ParcelStatus> Stage2ConsoleApp::promptOptionalParcelStatus(
     }
 }
 
+// 提示输入可选物品类型。
 std::optional<ParcelItemType> Stage2ConsoleApp::promptOptionalItemType(
     std::string_view label) {
     std::cout << label << '\n';
@@ -525,6 +553,7 @@ std::optional<ParcelItemType> Stage2ConsoleApp::promptOptionalItemType(
     }
 }
 
+// 提示输入物品类型和计费数量。
 std::unique_ptr<Item> Stage2ConsoleApp::promptItem() {
     std::cout << "快递类型\n";
     std::cout << "  1. 普通快递（5元/kg）\n";
@@ -543,6 +572,7 @@ std::unique_ptr<Item> Stage2ConsoleApp::promptItem() {
     return std::make_unique<BookItem>(promptPositiveInt("请输入图书本数"));
 }
 
+// 提示输入正数小数。
 double Stage2ConsoleApp::promptPositiveDouble(std::string_view label) {
     while (true) {
         const std::string input = ConsoleInput::promptLine(label);
@@ -557,6 +587,7 @@ double Stage2ConsoleApp::promptPositiveDouble(std::string_view label) {
     }
 }
 
+// 提示输入正整数。
 int Stage2ConsoleApp::promptPositiveInt(std::string_view label) {
     while (true) {
         const std::string input = ConsoleInput::promptLine(label);
@@ -572,6 +603,7 @@ int Stage2ConsoleApp::promptPositiveInt(std::string_view label) {
     }
 }
 
+// 解析空格或逗号分隔的选择序号。
 std::optional<std::vector<size_t>> Stage2ConsoleApp::parseSelectionIndices(
     std::string_view input,
     size_t maxCount) {
@@ -623,6 +655,7 @@ std::optional<std::vector<size_t>> Stage2ConsoleApp::parseSelectionIndices(
     return indices;
 }
 
+// 返回快递状态显示文本。
 std::string Stage2ConsoleApp::parcelStatusText(ParcelStatus status) {
     switch (status) {
         case ParcelStatus::WaitingForPickup:
@@ -635,6 +668,7 @@ std::string Stage2ConsoleApp::parcelStatusText(ParcelStatus status) {
     return "未知";
 }
 
+// 返回物品类型显示文本。
 std::string Stage2ConsoleApp::parcelItemTypeText(ParcelItemType itemType) {
     switch (itemType) {
         case ParcelItemType::Standard:
@@ -647,6 +681,7 @@ std::string Stage2ConsoleApp::parcelItemTypeText(ParcelItemType itemType) {
     return "未知";
 }
 
+// 格式化时间戳用于控制台显示。
 std::string Stage2ConsoleApp::formatTimestampForDisplay(
     std::string_view timestamp) {
     if (timestamp.empty()) {
@@ -659,6 +694,7 @@ std::string Stage2ConsoleApp::formatTimestampForDisplay(
     }
 }
 
+// 打印用户列表。
 void Stage2ConsoleApp::printUserList(const std::vector<User>& users) {
     if (users.empty()) {
         std::cout << "暂无注册用户。\n";
@@ -675,6 +711,7 @@ void Stage2ConsoleApp::printUserList(const std::vector<User>& users) {
     }
 }
 
+// 打印快递员列表。
 void Stage2ConsoleApp::printCourierList(
     const std::vector<Courier>& couriers) {
     if (couriers.empty()) {
@@ -691,6 +728,7 @@ void Stage2ConsoleApp::printCourierList(
     }
 }
 
+// 打印快递列表。
 void Stage2ConsoleApp::printParcelList(const std::vector<Parcel>& parcels) {
     if (parcels.empty()) {
         std::cout << "没有符合条件的快递。\n";
@@ -720,6 +758,7 @@ void Stage2ConsoleApp::printParcelList(const std::vector<Parcel>& parcels) {
     }
 }
 
+// 打印快递服务错误。
 void Stage2ConsoleApp::printParcelServiceError(ParcelServiceError error) {
     switch (error) {
         case ParcelServiceError::Nil:
@@ -770,6 +809,7 @@ void Stage2ConsoleApp::printParcelServiceError(ParcelServiceError error) {
     }
 }
 
+// 运行阶段 2 控制台主循环。
 int Stage2ConsoleApp::run() {
     std::cout << "ExpressFlow Stage 2" << '\n';
 

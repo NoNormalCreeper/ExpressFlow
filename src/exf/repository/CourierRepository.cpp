@@ -15,7 +15,7 @@ bool CourierRepository::isReady() const {
 
 // 按用户名查找快递员。
 const Courier* CourierRepository::findCourier(
-    const std::string_view& username) const {
+    std::string_view username) const {
     auto it = std::find_if(couriers_.begin(),
                            couriers_.end(),
                            [&username](const Courier& courier) {
@@ -32,7 +32,7 @@ void CourierRepository::createCourier(const Courier& courier) {
 }
 
 // 删除指定快递员并保存。
-void CourierRepository::deleteCourier(const std::string_view& username) {
+void CourierRepository::deleteCourier(std::string_view username) {
     auto it = std::find_if(couriers_.begin(),
                            couriers_.end(),
                            [&username](const Courier& courier) {
@@ -46,7 +46,7 @@ void CourierRepository::deleteCourier(const std::string_view& username) {
 }
 
 // 替换指定快递员并保存。
-void CourierRepository::updateCourier(const std::string_view& username,
+void CourierRepository::updateCourier(std::string_view username,
                                       const Courier& courier) {
     auto it = std::find_if(couriers_.begin(),
                            couriers_.end(),
@@ -67,7 +67,7 @@ const std::vector<Courier>& CourierRepository::listAll() const {
 
 // 判断指定快递员是否存在。
 bool CourierRepository::courierExists(
-    const std::string_view& username) const {
+    std::string_view username) const {
     return findCourier(username) != nullptr;
 }
 

@@ -19,15 +19,15 @@ class ParcelRepository {
      */
     explicit ParcelRepository(const FileStorage& storage);
 
-    const Parcel* findParcel(const std::string_view& id) const;
+    const Parcel* findParcel(std::string_view id) const;
     void createParcel(const Parcel& parcel);
-    void updateParcel(const std::string_view& id, const Parcel& parcel);
+    void updateParcel(std::string_view id, const Parcel& parcel);
 
     const std::vector<Parcel>& listAll() const;
-    std::vector<Parcel> listBySender(const std::string_view& username) const;
-    std::vector<Parcel> listByReceiver(const std::string_view& username) const;
+    std::vector<Parcel> listBySender(std::string_view username) const;
+    std::vector<Parcel> listByReceiver(std::string_view username) const;
     std::vector<Parcel> listWaitingForReceiver(
-        const std::string_view& username) const;
+        std::string_view username) const;
 
     /**
      * 返回仓储占位对象是否可用。

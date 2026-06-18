@@ -28,7 +28,7 @@ class RecordCodec {
 class UserRecordCodec : public RecordCodec {
    public:
     static std::string encode(const User& user);
-    static User decode(const std::string_view line);
+    static User decode(std::string_view line);
 };
 
 class ParcelRecordCodec : public RecordCodec {

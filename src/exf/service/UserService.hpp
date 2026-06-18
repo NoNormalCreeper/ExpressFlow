@@ -51,10 +51,10 @@ class UserService {
                                     const std::string& newPassword);
 
     // 假定传入的用户名可靠。需要调用方先判断。
-    util::Money getBalance(const std::string_view username) const;
-    UserAccountError topUpBalance(const std::string_view username,
+    util::Money getBalance(std::string_view username) const;
+    UserAccountError topUpBalance(std::string_view username,
                                   const util::Money& amount);
-    UserAccountError payFromBalance(const std::string_view username,
+    UserAccountError payFromBalance(std::string_view username,
                                     const util::Money& amount);
 
    private:
