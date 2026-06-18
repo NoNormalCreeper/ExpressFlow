@@ -58,6 +58,9 @@ class Stage3SessionManager {
     void removeSession(const std::string& token);
 
    private:
+    /** 生成角色和用户名组成的账号键。 */
+    static std::string accountKey(Stage3Role role, const std::string& username);
+
     /** 保护会话表和计数器。 */
     mutable std::mutex mutex_;
 

@@ -11,9 +11,11 @@
 
 namespace exf {
 
+// 创建客户端应用并初始化客户端服务。
 Stage3ClientApp::Stage3ClientApp(std::string host, uint16_t port)
     : host_(std::move(host)), port_(port), service_(host_, port_) {}
 
+// 运行客户端主循环。
 int Stage3ClientApp::run() {
     if (!service_.connect()) {
         std::cerr << service_.lastError() << '\n';
@@ -60,10 +62,12 @@ int Stage3ClientApp::run() {
     }
 }
 
+// 返回当前是否已登录。
 bool Stage3ClientApp::isLoggedIn() const {
     return service_.isLoggedIn();
 }
 
+// 执行登录交互流程。
 void Stage3ClientApp::login() {
     const Stage3Role role = promptLoginRole();
     const std::string username = ConsoleInput::promptNonEmpty("请输入用户名");
@@ -76,6 +80,7 @@ void Stage3ClientApp::login() {
     std::cout << response->message() << '\n';
 }
 
+// 执行退出登录流程。
 void Stage3ClientApp::logout() {
     if (!isLoggedIn()) {
         return;
@@ -86,6 +91,7 @@ void Stage3ClientApp::logout() {
     }
 }
 
+// 显示并处理用户菜单。
 void Stage3ClientApp::runUserMenu() {
     const int choice = ConsoleMenu::show(
         "用户菜单 (" + service_.username() + ")",
@@ -109,6 +115,7 @@ void Stage3ClientApp::runUserMenu() {
     }
 }
 
+// 显示并处理管理员菜单。
 void Stage3ClientApp::runAdminMenu() {
     const int choice =
         ConsoleMenu::show("管理员菜单 (" + service_.username() + ")",
@@ -146,6 +153,7 @@ void Stage3ClientApp::runAdminMenu() {
     }
 }
 
+// 显示并处理快递员菜单。
 void Stage3ClientApp::runCourierMenu() {
     const int choice = ConsoleMenu::show(
         "快递员菜单 (" + service_.username() + ")",
@@ -166,6 +174,7 @@ void Stage3ClientApp::runCourierMenu() {
     }
 }
 
+// 执行用户寄件交互流程。
 void Stage3ClientApp::sendParcel() {
     const std::string receiver =
         ConsoleInput::promptNonEmpty("请输入收件人用户名");
@@ -186,6 +195,7 @@ void Stage3ClientApp::sendParcel() {
     std::cout << '\n';
 }
 
+// 查询并显示待签收快递。
 void Stage3ClientApp::listWaitingSign() {
     const auto parcels = service_.listWaitingSign();
     if (printServiceError()) {
@@ -194,6 +204,7 @@ void Stage3ClientApp::listWaitingSign() {
     printParcels(parcels);
 }
 
+// 选择并签收待签收快递。
 void Stage3ClientApp::signParcel() {
     const auto parcels = service_.listWaitingSign();
     if (printServiceError()) {
@@ -216,6 +227,7 @@ void Stage3ClientApp::signParcel() {
     }
 }
 
+// 查询并显示当前用户相关快递。
 void Stage3ClientApp::listMyParcels() {
     const auto parcels = service_.listMyParcels();
     if (printServiceError()) {
@@ -224,6 +236,7 @@ void Stage3ClientApp::listMyParcels() {
     printParcels(parcels);
 }
 
+// 查询并显示所有用户。
 void Stage3ClientApp::listUsers() {
     const auto users = service_.listUsers();
     if (printServiceError()) {
@@ -232,6 +245,7 @@ void Stage3ClientApp::listUsers() {
     printUsers(users);
 }
 
+// 查询并显示未分配快递。
 void Stage3ClientApp::listUnassigned() {
     const auto parcels = service_.listUnassigned();
     if (printServiceError()) {
@@ -240,6 +254,7 @@ void Stage3ClientApp::listUnassigned() {
     printParcels(parcels);
 }
 
+// 查询并显示快递员列表。
 void Stage3ClientApp::listCouriers() {
     const auto couriers = service_.listCouriers();
     if (printServiceError()) {
@@ -248,6 +263,7 @@ void Stage3ClientApp::listCouriers() {
     printCouriers(couriers);
 }
 
+// 执行新增快递员交互流程。
 void Stage3ClientApp::addCourier() {
     const std::string username =
         ConsoleInput::promptNonEmpty("请输入快递员用户名");
@@ -263,6 +279,7 @@ void Stage3ClientApp::addCourier() {
     }
 }
 
+// 选择并删除快递员。
 void Stage3ClientApp::deleteCourier() {
     const auto couriers = service_.listCouriers();
     if (printServiceError()) {
@@ -285,6 +302,7 @@ void Stage3ClientApp::deleteCourier() {
     }
 }
 
+// 选择快递和快递员并执行分配。
 void Stage3ClientApp::assignCourier() {
     const auto parcels = service_.listUnassigned();
     if (printServiceError()) {
@@ -321,6 +339,7 @@ void Stage3ClientApp::assignCourier() {
     }
 }
 
+// 查询并显示全部快递。
 void Stage3ClientApp::listAllParcels() {
     const auto parcels = service_.listAllParcels();
     if (printServiceError()) {
@@ -329,6 +348,7 @@ void Stage3ClientApp::listAllParcels() {
     printParcels(parcels);
 }
 
+// 以管理员身份选择快递员并查看其任务。
 void Stage3ClientApp::listCourierParcelsAsAdmin() {
     const auto couriers = service_.listCouriers();
     if (printServiceError()) {
@@ -351,6 +371,7 @@ void Stage3ClientApp::listCourierParcelsAsAdmin() {
     printParcels(parcels);
 }
 
+// 查询并显示当前快递员待揽收任务。
 void Stage3ClientApp::listPickupTasks() {
     const auto parcels = service_.listPickupTasks();
     if (printServiceError()) {
@@ -359,6 +380,7 @@ void Stage3ClientApp::listPickupTasks() {
     printParcels(parcels);
 }
 
+// 选择并揽收快递。
 void Stage3ClientApp::pickupParcel() {
     const auto parcels = service_.listPickupTasks();
     if (printServiceError()) {
@@ -381,6 +403,7 @@ void Stage3ClientApp::pickupParcel() {
     }
 }
 
+// 查询并显示当前快递员相关快递。
 void Stage3ClientApp::listCourierParcels() {
     const auto parcels = service_.listCourierParcels();
     if (printServiceError()) {
@@ -389,6 +412,7 @@ void Stage3ClientApp::listCourierParcels() {
     printParcels(parcels);
 }
 
+// 打印服务错误并返回是否存在错误。
 bool Stage3ClientApp::printServiceError() const {
     if (service_.lastError().empty()) {
         return false;
@@ -397,6 +421,7 @@ bool Stage3ClientApp::printServiceError() const {
     return true;
 }
 
+// 提示用户选择登录身份。
 Stage3Role Stage3ClientApp::promptLoginRole() {
     const int roleChoice = ConsoleMenu::show(
         "登录身份", {"用户", "快递员", "管理员"}, "", "请选择登录身份");
@@ -410,6 +435,7 @@ Stage3Role Stage3ClientApp::promptLoginRole() {
     }
 }
 
+// 提示用户选择快递物品类型。
 std::string Stage3ClientApp::promptItemType() {
     const int choice = ConsoleMenu::show(
         "快递类型",
@@ -424,6 +450,7 @@ std::string Stage3ClientApp::promptItemType() {
     }
 }
 
+// 提示用户输入大于零的计费数量。
 std::string Stage3ClientApp::promptPositiveAmount() {
     while (true) {
         const std::string input =
@@ -438,14 +465,17 @@ std::string Stage3ClientApp::promptPositiveAmount() {
     }
 }
 
+// 打印用户列表。
 void Stage3ClientApp::printUsers(const std::vector<User>& users) {
     ConsoleDisplay::printUsers(users);
 }
 
+// 打印快递列表。
 void Stage3ClientApp::printParcels(const std::vector<Parcel>& parcels) {
     ConsoleDisplay::printParcels(parcels);
 }
 
+// 打印快递员列表。
 void Stage3ClientApp::printCouriers(const std::vector<Courier>& couriers) {
     ConsoleDisplay::printCouriers(couriers);
 }

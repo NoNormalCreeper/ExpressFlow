@@ -35,6 +35,7 @@ class Stage3ServerApp {
     int run(const std::string& host, uint16_t port);
 
    private:
+    /** 最大并发客户端连接数。 */
     static constexpr unsigned int kMaxClients = 32;
 
     /** 网络版独立文件存储。 */
@@ -73,6 +74,7 @@ class Stage3ServerApp {
     /** 当前在线连接数。 */
     std::atomic<unsigned int> activeClients_{0};
 
+    /** 处理单个客户端连接。 */
     void handleClient(TcpConnection connection);
 };
 

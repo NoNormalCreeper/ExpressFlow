@@ -169,11 +169,20 @@ class Stage3ClientService {
     /** 最近一次错误。 */
     std::string lastError_;
 
+    /** 重新建立 TCP 连接。 */
     bool reconnect();
+
+    /** 清理本地登录状态。 */
     void clearLoginState();
+
+    /** 发送协议请求并读取响应。 */
     std::optional<Stage3Response> sendRequest(
         const Stage3Request& request);
+
+    /** 按命令获取快递列表。 */
     std::vector<Parcel> fetchParcels(const std::string& command);
+
+    /** 按完整请求获取快递列表。 */
     std::vector<Parcel> fetchParcels(const Stage3Request& request);
 };
 

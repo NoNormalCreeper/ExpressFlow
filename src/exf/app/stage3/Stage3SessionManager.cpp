@@ -5,25 +5,28 @@
 #include "exf/util/TimeUtil.hpp"
 
 namespace exf {
-namespace {
 
-std::string accountKey(Stage3Role role, const std::string& username) {
-    return Stage3RoleCodec::encode(role) + ":" + username;
-}
-
-}  // namespace
-
+// 创建一个登录态对象。
 Stage3Session::Stage3Session(Stage3Role role, std::string username)
     : role_(role), username_(std::move(username)) {}
 
+// 返回登录态角色。
 Stage3Role Stage3Session::role() const {
     return role_;
 }
 
+// 返回登录态用户名。
 const std::string& Stage3Session::username() const {
     return username_;
 }
 
+// 生成用于限制单账号单会话的账号键。
+std::string Stage3SessionManager::accountKey(Stage3Role role,
+                                             const std::string& username) {
+    return Stage3RoleCodec::encode(role) + ":" + username;
+}
+
+// 创建新会话并替换同账号旧会话。
 std::string Stage3SessionManager::createSession(Stage3Role role,
                                                 const std::string& username) {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -42,6 +45,7 @@ std::string Stage3SessionManager::createSession(Stage3Role role,
     return token;
 }
 
+// 按 token 查询会话。
 std::optional<Stage3Session> Stage3SessionManager::findSession(
     const std::string& token) const {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -52,6 +56,7 @@ std::optional<Stage3Session> Stage3SessionManager::findSession(
     return it->second;
 }
 
+// 删除 token 对应会话。
 void Stage3SessionManager::removeSession(const std::string& token) {
     std::lock_guard<std::mutex> lock(mutex_);
     const auto it = sessions_.find(token);

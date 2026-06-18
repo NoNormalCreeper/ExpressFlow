@@ -18,6 +18,7 @@ constexpr std::array<Stage3RoleEntry, 3> kStage3Roles{{
 
 }  // namespace
 
+// 将角色编码为协议字段。
 std::string Stage3RoleCodec::encode(Stage3Role role) {
     switch (role) {
         case Stage3Role::User:
@@ -30,6 +31,7 @@ std::string Stage3RoleCodec::encode(Stage3Role role) {
     return "";
 }
 
+// 从协议字段解码角色。
 std::optional<Stage3Role> Stage3RoleCodec::decode(std::string_view text) {
     for (const auto& entry : kStage3Roles) {
         if (entry.text == text) {
@@ -39,6 +41,7 @@ std::optional<Stage3Role> Stage3RoleCodec::decode(std::string_view text) {
     return std::nullopt;
 }
 
+// 返回角色显示名称。
 std::string Stage3RoleCodec::displayName(Stage3Role role) {
     switch (role) {
         case Stage3Role::User:

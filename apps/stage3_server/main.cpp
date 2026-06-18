@@ -6,25 +6,21 @@
 #include <iostream>
 #include <string>
 
-namespace {
-
-bool parsePort(const std::string& text, uint16_t& port) {
-    try {
-        size_t parsed = 0;
-        const long value = std::stol(text, &parsed);
-        if (parsed != text.size() || value < 1 || value > 65535) {
+int main(int argc, char* argv[]) {
+    const auto parsePort = [](const std::string& text, uint16_t& port) {
+        try {
+            size_t parsed = 0;
+            const long value = std::stol(text, &parsed);
+            if (parsed != text.size() || value < 1 || value > 65535) {
+                return false;
+            }
+            port = static_cast<uint16_t>(value);
+            return true;
+        } catch (const std::exception&) {
             return false;
         }
-        port = static_cast<uint16_t>(value);
-        return true;
-    } catch (const std::exception&) {
-        return false;
-    }
-}
+    };
 
-}  // namespace
-
-int main(int argc, char* argv[]) {
     std::string host = "0.0.0.0";
     uint16_t port = 18080;
     std::filesystem::path dataDir = "data_stage3";

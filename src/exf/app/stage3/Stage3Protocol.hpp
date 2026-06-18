@@ -72,6 +72,7 @@ class Stage3Response {
     const std::vector<std::string>& fields() const;
 
    private:
+    /** 创建响应对象。 */
     Stage3Response(bool ok,
                    std::string code,
                    std::string message,

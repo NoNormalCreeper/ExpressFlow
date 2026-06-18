@@ -11,54 +11,10 @@
 namespace exf {
 namespace {
 
-enum class Stage3Command {
-    Login,
-    SendParcel,
-    ListUnassigned,
-    AssignCourier,
-    ListUsers,
-    ListCouriers,
-    AddCourier,
-    DeleteCourier,
-    ListAllParcels,
-    ListMyParcels,
-    ListCourierParcels,
-    ListPickupTasks,
-    Pickup,
-    ListWaitingSign,
-    Sign,
-    Quit,
-    Unknown
-};
-
-struct Stage3CommandEntry {
-    std::string_view text;
-    Stage3Command command;
-};
-
 struct ParcelItemTypeEntry {
     std::string_view text;
     ParcelItemType type;
 };
-
-constexpr std::array<Stage3CommandEntry, 16> kStage3Commands{{
-    {"LOGIN", Stage3Command::Login},
-    {"SEND_PARCEL", Stage3Command::SendParcel},
-    {"LIST_UNASSIGNED", Stage3Command::ListUnassigned},
-    {"ASSIGN_COURIER", Stage3Command::AssignCourier},
-    {"LIST_USERS", Stage3Command::ListUsers},
-    {"LIST_COURIERS", Stage3Command::ListCouriers},
-    {"ADD_COURIER", Stage3Command::AddCourier},
-    {"DELETE_COURIER", Stage3Command::DeleteCourier},
-    {"LIST_ALL_PARCELS", Stage3Command::ListAllParcels},
-    {"LIST_MY_PARCELS", Stage3Command::ListMyParcels},
-    {"LIST_COURIER_PARCELS", Stage3Command::ListCourierParcels},
-    {"LIST_PICKUP_TASKS", Stage3Command::ListPickupTasks},
-    {"PICKUP", Stage3Command::Pickup},
-    {"LIST_WAITING_SIGN", Stage3Command::ListWaitingSign},
-    {"SIGN", Stage3Command::Sign},
-    {"QUIT", Stage3Command::Quit},
-}};
 
 constexpr std::array<ParcelItemTypeEntry, 3> kParcelItemTypes{{
     {"standard", ParcelItemType::Standard},
@@ -66,17 +22,9 @@ constexpr std::array<ParcelItemTypeEntry, 3> kParcelItemTypes{{
     {"book", ParcelItemType::Book},
 }};
 
-Stage3Command parseStage3Command(std::string_view text) {
-    for (const auto& entry : kStage3Commands) {
-        if (entry.text == text) {
-            return entry.command;
-        }
-    }
-    return Stage3Command::Unknown;
-}
-
 }  // namespace
 
+// 构造请求分发器并绑定业务服务。
 Stage3RequestDispatcher::Stage3RequestDispatcher(UserService& users,
                                                  AdminService& admins,
                                                  CourierService& couriers,
@@ -88,6 +36,7 @@ Stage3RequestDispatcher::Stage3RequestDispatcher(UserService& users,
       parcels_(parcels),
       sessions_(sessions) {}
 
+// 解码一行请求并编码响应。
 std::string Stage3RequestDispatcher::handleLine(const std::string& line) {
     try {
         const auto request = Stage3Protocol::decodeRequest(line);
@@ -103,6 +52,7 @@ std::string Stage3RequestDispatcher::handleLine(const std::string& line) {
     }
 }
 
+// 按命令类型分派已解码请求。
 Stage3Response Stage3RequestDispatcher::handleRequest(
     const Stage3Request& request) {
     std::lock_guard<std::mutex> lock(businessMutex_);
@@ -148,6 +98,42 @@ Stage3Response Stage3RequestDispatcher::handleRequest(
     return Stage3Response::error("UnknownCommand", "未知请求命令");
 }
 
+// 将协议命令文本转换为内部命令枚举。
+Stage3RequestDispatcher::Stage3Command
+Stage3RequestDispatcher::parseStage3Command(std::string_view text) {
+    struct Entry {
+        std::string_view text;
+        Stage3Command command;
+    };
+
+    constexpr std::array<Entry, 16> commands{{
+        {"LOGIN", Stage3Command::Login},
+        {"SEND_PARCEL", Stage3Command::SendParcel},
+        {"LIST_UNASSIGNED", Stage3Command::ListUnassigned},
+        {"ASSIGN_COURIER", Stage3Command::AssignCourier},
+        {"LIST_USERS", Stage3Command::ListUsers},
+        {"LIST_COURIERS", Stage3Command::ListCouriers},
+        {"ADD_COURIER", Stage3Command::AddCourier},
+        {"DELETE_COURIER", Stage3Command::DeleteCourier},
+        {"LIST_ALL_PARCELS", Stage3Command::ListAllParcels},
+        {"LIST_MY_PARCELS", Stage3Command::ListMyParcels},
+        {"LIST_COURIER_PARCELS", Stage3Command::ListCourierParcels},
+        {"LIST_PICKUP_TASKS", Stage3Command::ListPickupTasks},
+        {"PICKUP", Stage3Command::Pickup},
+        {"LIST_WAITING_SIGN", Stage3Command::ListWaitingSign},
+        {"SIGN", Stage3Command::Sign},
+        {"QUIT", Stage3Command::Quit},
+    }};
+
+    for (const auto& entry : commands) {
+        if (entry.text == text) {
+            return entry.command;
+        }
+    }
+    return Stage3Command::Unknown;
+}
+
+// 处理登录请求并创建会话。
 Stage3Response Stage3RequestDispatcher::handleLogin(
     const std::vector<std::string>& fields) {
     if (fields.size() != 3) {
@@ -196,6 +182,7 @@ Stage3Response Stage3RequestDispatcher::handleLogin(
     return Stage3Response::error("InvalidRole", "登录角色不支持");
 }
 
+// 处理用户寄件请求。
 Stage3Response Stage3RequestDispatcher::handleSendParcel(
     const std::vector<std::string>& fields) {
     if (fields.size() != 5) {
@@ -229,6 +216,7 @@ Stage3Response Stage3RequestDispatcher::handleSendParcel(
     return Stage3Response::ok("寄件成功", {parcelId});
 }
 
+// 查询等待管理员分配快递员的快递。
 Stage3Response Stage3RequestDispatcher::handleListUnassigned(
     const std::vector<std::string>& fields) {
     const auto session = requireSession(fields, Stage3Role::Admin);
@@ -248,6 +236,7 @@ Stage3Response Stage3RequestDispatcher::handleListUnassigned(
     return Stage3Response::ok(std::to_string(parcels.size()), encoded);
 }
 
+// 处理管理员分配快递员请求。
 Stage3Response Stage3RequestDispatcher::handleAssignCourier(
     const std::vector<std::string>& fields) {
     if (fields.size() != 3) {
@@ -265,6 +254,7 @@ Stage3Response Stage3RequestDispatcher::handleAssignCourier(
     return Stage3Response::ok("快递员分配成功");
 }
 
+// 查询快递员列表。
 Stage3Response Stage3RequestDispatcher::handleListCouriers(
     const std::vector<std::string>& fields) {
     const auto session = requireSession(fields, Stage3Role::Admin);
@@ -281,6 +271,7 @@ Stage3Response Stage3RequestDispatcher::handleListCouriers(
     return Stage3Response::ok(std::to_string(couriers.size()), encoded);
 }
 
+// 查询用户列表。
 Stage3Response Stage3RequestDispatcher::handleListUsers(
     const std::vector<std::string>& fields) {
     const auto session = requireSession(fields, Stage3Role::Admin);
@@ -297,6 +288,7 @@ Stage3Response Stage3RequestDispatcher::handleListUsers(
     return Stage3Response::ok(std::to_string(users.size()), encoded);
 }
 
+// 处理管理员新增快递员请求。
 Stage3Response Stage3RequestDispatcher::handleAddCourier(
     const std::vector<std::string>& fields) {
     if (fields.size() != 5) {
@@ -315,6 +307,7 @@ Stage3Response Stage3RequestDispatcher::handleAddCourier(
     return Stage3Response::ok("快递员添加成功");
 }
 
+// 处理管理员删除快递员请求。
 Stage3Response Stage3RequestDispatcher::handleDeleteCourier(
     const std::vector<std::string>& fields) {
     if (fields.size() != 2) {
@@ -332,6 +325,7 @@ Stage3Response Stage3RequestDispatcher::handleDeleteCourier(
     return Stage3Response::ok("快递员删除成功");
 }
 
+// 查询全部快递。
 Stage3Response Stage3RequestDispatcher::handleListAllParcels(
     const std::vector<std::string>& fields) {
     const auto session = requireSession(fields, Stage3Role::Admin);
@@ -348,6 +342,7 @@ Stage3Response Stage3RequestDispatcher::handleListAllParcels(
     return Stage3Response::ok(std::to_string(parcels.size()), encoded);
 }
 
+// 查询当前用户相关快递。
 Stage3Response Stage3RequestDispatcher::handleListMyParcels(
     const std::vector<std::string>& fields) {
     const auto session = requireSession(fields, Stage3Role::User);
@@ -365,6 +360,7 @@ Stage3Response Stage3RequestDispatcher::handleListMyParcels(
     return Stage3Response::ok(std::to_string(parcels.size()), encoded);
 }
 
+// 查询指定或当前快递员相关快递。
 Stage3Response Stage3RequestDispatcher::handleListCourierParcels(
     const std::vector<std::string>& fields) {
     const auto session = requireAnySession(fields);
@@ -398,6 +394,7 @@ Stage3Response Stage3RequestDispatcher::handleListCourierParcels(
     return Stage3Response::ok(std::to_string(parcels.size()), encoded);
 }
 
+// 查询快递员待揽收任务。
 Stage3Response Stage3RequestDispatcher::handleListPickupTasks(
     const std::vector<std::string>& fields) {
     const auto session = requireSession(fields, Stage3Role::Courier);
@@ -416,6 +413,7 @@ Stage3Response Stage3RequestDispatcher::handleListPickupTasks(
     return Stage3Response::ok(std::to_string(parcels.size()), encoded);
 }
 
+// 处理快递员揽收请求。
 Stage3Response Stage3RequestDispatcher::handlePickup(
     const std::vector<std::string>& fields) {
     if (fields.size() != 2) {
@@ -433,6 +431,7 @@ Stage3Response Stage3RequestDispatcher::handlePickup(
     return Stage3Response::ok("揽收成功");
 }
 
+// 查询用户待签收快递。
 Stage3Response Stage3RequestDispatcher::handleListWaitingSign(
     const std::vector<std::string>& fields) {
     const auto session = requireSession(fields, Stage3Role::User);
@@ -450,6 +449,7 @@ Stage3Response Stage3RequestDispatcher::handleListWaitingSign(
     return Stage3Response::ok(std::to_string(parcels.size()), encoded);
 }
 
+// 处理用户签收请求。
 Stage3Response Stage3RequestDispatcher::handleSign(
     const std::vector<std::string>& fields) {
     if (fields.size() != 2) {
@@ -467,6 +467,7 @@ Stage3Response Stage3RequestDispatcher::handleSign(
     return Stage3Response::ok("签收成功");
 }
 
+// 处理退出登录请求。
 Stage3Response Stage3RequestDispatcher::handleQuit(
     const std::vector<std::string>& fields) {
     const auto session = requireAnySession(fields);
@@ -477,6 +478,7 @@ Stage3Response Stage3RequestDispatcher::handleQuit(
     return Stage3Response::ok("已退出登录");
 }
 
+// 校验指定角色的登录会话。
 std::optional<Stage3Session> Stage3RequestDispatcher::requireSession(
     const std::vector<std::string>& fields,
     Stage3Role role) const {
@@ -487,6 +489,7 @@ std::optional<Stage3Session> Stage3RequestDispatcher::requireSession(
     return session;
 }
 
+// 校验任意角色的登录会话。
 std::optional<Stage3Session> Stage3RequestDispatcher::requireAnySession(
     const std::vector<std::string>& fields) const {
     if (fields.empty()) {
@@ -495,6 +498,7 @@ std::optional<Stage3Session> Stage3RequestDispatcher::requireAnySession(
     return sessions_.findSession(fields[0]);
 }
 
+// 根据物品类型创建对应物品对象。
 std::unique_ptr<Item> Stage3RequestDispatcher::makeItem(ParcelItemType type,
                                                         double amount) {
     switch (type) {
@@ -508,6 +512,7 @@ std::unique_ptr<Item> Stage3RequestDispatcher::makeItem(ParcelItemType type,
     return std::make_unique<BookItem>(static_cast<int>(amount));
 }
 
+// 解析物品类型协议字段。
 std::optional<ParcelItemType> Stage3RequestDispatcher::parseItemType(
     const std::string& text) {
     for (const auto& entry : kParcelItemTypes) {
@@ -518,18 +523,22 @@ std::optional<ParcelItemType> Stage3RequestDispatcher::parseItemType(
     return std::nullopt;
 }
 
+// 将快递对象编码为协议字段。
 std::string Stage3RequestDispatcher::encodeParcel(const Parcel& parcel) {
     return ParcelRecordCodec::encode(parcel);
 }
 
+// 将快递员对象编码为协议字段。
 std::string Stage3RequestDispatcher::encodeCourier(const Courier& courier) {
     return CourierRecordCodec::encode(courier);
 }
 
+// 将用户对象编码为协议字段。
 std::string Stage3RequestDispatcher::encodeUser(const User& user) {
     return UserRecordCodec::encode(user);
 }
 
+// 将快递服务错误转换为协议响应。
 Stage3Response Stage3RequestDispatcher::parcelError(ParcelServiceError error) {
     switch (error) {
         case ParcelServiceError::SenderNotFound:
@@ -579,6 +588,7 @@ Stage3Response Stage3RequestDispatcher::parcelError(ParcelServiceError error) {
     return Stage3Response::error("ParcelError", "快递操作失败");
 }
 
+// 将用户服务错误转换为协议响应。
 Stage3Response Stage3RequestDispatcher::userError(UserServiceError error) {
     switch (error) {
         case UserServiceError::UserNotFound:
@@ -596,6 +606,7 @@ Stage3Response Stage3RequestDispatcher::userError(UserServiceError error) {
     return Stage3Response::error("UserError", "用户操作失败");
 }
 
+// 将快递员服务错误转换为协议响应。
 Stage3Response Stage3RequestDispatcher::courierError(
     CourierServiceError error) {
     switch (error) {

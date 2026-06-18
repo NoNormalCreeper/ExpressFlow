@@ -8,6 +8,7 @@
 
 namespace exf {
 
+// 构造使用独立数据目录的服务端应用。
 Stage3ServerApp::Stage3ServerApp(std::filesystem::path dataDir)
     : storage_(std::move(dataDir)),
       userRepository_(storage_),
@@ -27,6 +28,7 @@ Stage3ServerApp::Stage3ServerApp(std::filesystem::path dataDir)
                   parcelService_,
                   sessions_) {}
 
+// 启动 TCP 监听并为每个客户端创建处理线程。
 int Stage3ServerApp::run(const std::string& host, uint16_t port) {
     TcpServer server;
     if (!server.listenOn(host, port)) {
@@ -54,6 +56,7 @@ int Stage3ServerApp::run(const std::string& host, uint16_t port) {
     }
 }
 
+// 循环读取单个客户端请求并写回响应。
 void Stage3ServerApp::handleClient(TcpConnection connection) {
     while (connection.isOpen()) {
         auto line = connection.receiveLine();
