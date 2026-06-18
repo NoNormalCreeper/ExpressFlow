@@ -7,7 +7,8 @@
 
 namespace exf {
 
-void ConsoleMenu::printMenu(const std::string_view title,
+// 打印带序号的菜单项。
+void ConsoleMenu::printMenu(std::string_view title,
                             const std::vector<std::string>& options,
                             int startIndex) {
     std::cout << title << '\n';
@@ -16,11 +17,13 @@ void ConsoleMenu::printMenu(const std::string_view title,
     }
 }
 
-void ConsoleMenu::printSeparator(const std::string_view separator, int length) {
+// 打印分隔线。
+void ConsoleMenu::printSeparator(std::string_view separator, int length) {
     std::cout << std::string(length, separator.empty() ? '-' : separator[0])
               << '\n';
 }
 
+// 打印当前登录状态。
 void ConsoleMenu::printLoginStatus(const MainMenu::Context& ctx) {
     std::cout << "登录状态：" << (ctx.loggedIn ? "已登录" : "未登录");
     if (ctx.loggedIn == 1) {
@@ -31,6 +34,7 @@ void ConsoleMenu::printLoginStatus(const MainMenu::Context& ctx) {
     std::cout << '\n';
 }
 
+// 显示主菜单并返回选择。
 int ConsoleMenu::showMainMenu(const MainMenu::Context& ctx) {
     const std::vector<std::string> options = {
         "账号菜单", "余额管理菜单", "快递菜单", "管理员菜单", "退出程序"};
@@ -41,6 +45,7 @@ int ConsoleMenu::showMainMenu(const MainMenu::Context& ctx) {
     return ConsoleInput::promptChoice("请选择一个选项", 1, options.size());
 }
 
+// 显示账号菜单并返回选择。
 int ConsoleMenu::showUserMenu(const MainMenu::Context& ctx) {
     const std::vector<std::string> options = {
         "注册", "用户登录", "管理员登录", "修改密码", "退出登录", "返回主菜单"};
@@ -51,6 +56,7 @@ int ConsoleMenu::showUserMenu(const MainMenu::Context& ctx) {
     return ConsoleInput::promptChoice("请选择一个选项", 1, options.size());
 }
 
+// 显示余额菜单并返回选择。
 int ConsoleMenu::showAccountMenu(const MainMenu::Context& ctx) {
     const std::vector<std::string> options = {"查看余额", "充值账户",
                                               "返回主菜单"};
@@ -66,6 +72,7 @@ int ConsoleMenu::showAccountMenu(const MainMenu::Context& ctx) {
     return ConsoleInput::promptChoice("请选择一个选项", 1, options.size());
 }
 
+// 显示快递菜单并返回选择。
 int ConsoleMenu::showParcelMenu(const MainMenu::Context& ctx) {
     const std::vector<std::string> options = {"发送快递", "待签收并签收",
                                               "查询快递", "返回主菜单"};
@@ -81,6 +88,7 @@ int ConsoleMenu::showParcelMenu(const MainMenu::Context& ctx) {
     return ConsoleInput::promptChoice("请选择一个选项", 1, options.size());
 }
 
+// 显示管理员菜单并返回选择。
 int ConsoleMenu::showAdminMenu(const MainMenu::Context& ctx) {
     const std::vector<std::string> options = {"查看所有用户信息",
                                               "查询全部快递",

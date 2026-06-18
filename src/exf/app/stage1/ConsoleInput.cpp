@@ -6,6 +6,8 @@
 #include "exf/util/TimeUtil.hpp"
 
 namespace exf {
+
+// 提示用户输入一行文本。
 std::string ConsoleInput::promptLine(std::string_view label) {
     std::cout << label << "> ";
     std::string input;
@@ -13,12 +15,14 @@ std::string ConsoleInput::promptLine(std::string_view label) {
     return input;
 }
 
+// 提示用户输入非空文本。
 std::string ConsoleInput::promptNonEmpty(std::string_view label) {
     return promptIf(
         label, [](const std::string& input) { return !input.empty(); },
         "输入不能为空，请重新输入。");
 }
 
+// 提示用户输入可为空文本。
 std::optional<std::string> ConsoleInput::promptOptionalText(
     std::string_view label) {
     auto input = promptLine(label);
@@ -28,6 +32,7 @@ std::optional<std::string> ConsoleInput::promptOptionalText(
     return input;
 }
 
+// 提示用户输入可为空时间戳。
 std::optional<std::string> ConsoleInput::promptOptionalTimestamp(
     std::string_view label) {
     while (true) {
@@ -46,6 +51,7 @@ std::optional<std::string> ConsoleInput::promptOptionalTimestamp(
     }
 }
 
+// 提示用户输入非负金额。
 util::Money ConsoleInput::promptNonNegativeMoney(std::string_view label) {
     while (true) {
         std::string input = promptLine(label);
@@ -63,8 +69,10 @@ util::Money ConsoleInput::promptNonNegativeMoney(std::string_view label) {
     }
 }
 
+// 密码最小长度校验正则。
 const std::regex exf::ConsoleInput::passwordRegex{R"(.{6,})"};
 
+// 提示用户输入符合正则表达式的文本。
 std::string ConsoleInput::promptRegex(std::string_view label,
                                       const std::regex& pattern,
                                       std::string_view errorMessage) {
@@ -76,6 +84,7 @@ std::string ConsoleInput::promptRegex(std::string_view label,
         errorMessage);
 }
 
+// 提示用户输入指定范围内的菜单选项。
 int ConsoleInput::promptChoice(std::string_view label, int min, int max) {
     while (true) {
         std::string input = promptLine(label);
@@ -112,6 +121,7 @@ int ConsoleInput::promptChoice(std::string_view label, int min, int max) {
     }
 }
 
+// 提示用户输入符合自定义校验的文本。
 std::string ConsoleInput::promptIf(
     std::string_view label,
     const std::function<bool(const std::string&)>& validator,

@@ -22,7 +22,7 @@ std::vector<Parcel> ParcelRepository::listIf(
     }
     return temp;
 }
-const Parcel* ParcelRepository::findParcel(const std::string_view& id) const {
+const Parcel* ParcelRepository::findParcel(std::string_view id) const {
     auto it = std::find_if(parcels_.begin(), parcels_.end(),
                            [&id](const Parcel& p) { return p.id() == id; });
 
@@ -32,7 +32,7 @@ void ParcelRepository::createParcel(const Parcel& parcel) {
     parcels_.emplace_back(parcel);
     saveParcels();
 }
-void ParcelRepository::updateParcel(const std::string_view& id,
+void ParcelRepository::updateParcel(std::string_view id,
                                     const Parcel& parcel) {
     auto it = std::find_if(parcels_.begin(), parcels_.end(),
                            [&id](const Parcel& p) { return p.id() == id; });
@@ -46,19 +46,19 @@ const std::vector<Parcel>& ParcelRepository::listAll() const {
     return parcels_;
 }
 std::vector<Parcel> ParcelRepository::listBySender(
-    const std::string_view& username) const {
+    std::string_view username) const {
     return listIf([&username](const Parcel& p) {
         return p.senderUsername() == username;
     });
 }
 std::vector<Parcel> ParcelRepository::listByReceiver(
-    const std::string_view& username) const {
+    std::string_view username) const {
     return listIf([&username](const Parcel& p) {
         return p.receiverUsername() == username;
     });
 }
 std::vector<Parcel> ParcelRepository::listWaitingForReceiver(
-    const std::string_view& username) const {
+    std::string_view username) const {
     return listIf([&username](const Parcel& p) {
         return p.status() == ParcelStatus::WaitingForSign &&
                p.receiverUsername() == username;

@@ -78,7 +78,7 @@ std::string UserRecordCodec::encode(const User& user) {
     return join(fields);
 }
 
-User UserRecordCodec::decode(const std::string_view line) {
+User UserRecordCodec::decode(std::string_view line) {
     std::vector<std::string> fields = split(line);
     if (fields.size() != 6) {
         throw std::runtime_error("Invalid user record: " + std::string(line));

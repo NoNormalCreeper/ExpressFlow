@@ -11,6 +11,7 @@
 
 namespace exf {
 
+// 创建阶段 1 控制台应用并装配仓储和服务。
 Stage1ConsoleApp::Stage1ConsoleApp(std::filesystem::path dataDir)
     : storage_(std::move(dataDir)),
       userRepository_(storage_),
@@ -21,6 +22,7 @@ Stage1ConsoleApp::Stage1ConsoleApp(std::filesystem::path dataDir)
       adminService_(userRepository_),
       parcelService_(userRepository_, adminRepository_, parcelRepository_) {}
 
+// 处理用户注册流程。
 void Stage1ConsoleApp::handleUserRegister() {
     std::string username, name, phone, password, address;
 
@@ -56,6 +58,7 @@ void Stage1ConsoleApp::handleUserRegister() {
     }
 }
 
+// 处理用户登录流程并写入登录上下文。
 void Stage1ConsoleApp::handleUserLogin(MainMenu::Context& ctx) {
     std::string username, password;
 
@@ -90,6 +93,7 @@ void Stage1ConsoleApp::handleUserLogin(MainMenu::Context& ctx) {
     }
 }
 
+// 处理管理员登录流程并写入登录上下文。
 void Stage1ConsoleApp::handleAdminLogin(MainMenu::Context& ctx) {
     const auto& admin = adminRepository_.getAdmin();
     std::string username, password;
@@ -111,6 +115,7 @@ void Stage1ConsoleApp::handleAdminLogin(MainMenu::Context& ctx) {
     std::cout << "管理员登录成功！\n";
 }
 
+// 清空当前登录上下文。
 void Stage1ConsoleApp::handleLogout(MainMenu::Context& ctx) {
     if (ctx.loggedIn == 0) {
         std::cout << "当前尚未登录。\n";
@@ -122,7 +127,8 @@ void Stage1ConsoleApp::handleLogout(MainMenu::Context& ctx) {
     std::cout << "已退出登录。\n";
 }
 
-void Stage1ConsoleApp::handleChangePassword(MainMenu::Context& ctx) {
+// 处理用户修改密码流程。
+void Stage1ConsoleApp::handleChangePassword(const MainMenu::Context& ctx) {
     if (ctx.loggedIn != 1) {
         std::cout << "请先使用用户身份登录。\n";
         return;
@@ -178,7 +184,8 @@ void Stage1ConsoleApp::handleChangePassword(MainMenu::Context& ctx) {
     }
 }
 
-void Stage1ConsoleApp::handleGetBalance(MainMenu::Context& ctx) {
+// 查询当前登录用户余额。
+void Stage1ConsoleApp::handleGetBalance(const MainMenu::Context& ctx) {
     if (ctx.loggedIn != 1) {
         std::cout << "请先使用用户身份登录。\n";
         return;
@@ -188,7 +195,8 @@ void Stage1ConsoleApp::handleGetBalance(MainMenu::Context& ctx) {
               << " 元。\n";
 }
 
-void Stage1ConsoleApp::handleTopUpBalance(MainMenu::Context& ctx) {
+// 处理当前登录用户充值流程。
+void Stage1ConsoleApp::handleTopUpBalance(const MainMenu::Context& ctx) {
     if (ctx.loggedIn != 1) {
         std::cout << "请先使用用户身份登录。\n";
         return;
@@ -215,7 +223,8 @@ void Stage1ConsoleApp::handleTopUpBalance(MainMenu::Context& ctx) {
     }
 }
 
-void Stage1ConsoleApp::handleSendParcel(MainMenu::Context& ctx) {
+// 处理用户寄件流程。
+void Stage1ConsoleApp::handleSendParcel(const MainMenu::Context& ctx) {
     if (ctx.loggedIn != 1) {
         std::cout << "请先使用用户身份登录。\n";
         return;
@@ -256,7 +265,8 @@ void Stage1ConsoleApp::handleSendParcel(MainMenu::Context& ctx) {
     }
 }
 
-void Stage1ConsoleApp::handleSignParcels(MainMenu::Context& ctx) {
+// 处理用户批量签收流程。
+void Stage1ConsoleApp::handleSignParcels(const MainMenu::Context& ctx) {
     if (ctx.loggedIn != 1) {
         std::cout << "请先使用用户身份登录。\n";
         return;
@@ -315,7 +325,8 @@ void Stage1ConsoleApp::handleSignParcels(MainMenu::Context& ctx) {
     }
 }
 
-void Stage1ConsoleApp::handleQueryUserParcels(MainMenu::Context& ctx) {
+// 处理用户快递查询流程。
+void Stage1ConsoleApp::handleQueryUserParcels(const MainMenu::Context& ctx) {
     if (ctx.loggedIn != 1) {
         std::cout << "请先使用用户身份登录。\n";
         return;
@@ -353,7 +364,9 @@ void Stage1ConsoleApp::handleQueryUserParcels(MainMenu::Context& ctx) {
     printParcelList(parcels);
 }
 
-void Stage1ConsoleApp::handleQueryAdminParcels(MainMenu::Context& ctx) {
+// 处理管理员快递查询流程。
+void Stage1ConsoleApp::handleQueryAdminParcels(
+    const MainMenu::Context& ctx) {
     if (ctx.loggedIn != 2) {
         std::cout << "请先使用管理员身份登录。\n";
         return;
@@ -363,7 +376,8 @@ void Stage1ConsoleApp::handleQueryAdminParcels(MainMenu::Context& ctx) {
     printParcelList(parcelService_.queryAdminParcels(query));
 }
 
-void Stage1ConsoleApp::handleListUsers(MainMenu::Context& ctx) {
+// 处理管理员查看用户列表流程。
+void Stage1ConsoleApp::handleListUsers(const MainMenu::Context& ctx) {
     if (ctx.loggedIn != 2) {
         std::cout << "请先使用管理员身份登录。\n";
         return;
@@ -372,6 +386,7 @@ void Stage1ConsoleApp::handleListUsers(MainMenu::Context& ctx) {
     printUserList(adminService_.listUsers());
 }
 
+// 提示用户输入个人快递查询条件。
 ParcelQuery Stage1ConsoleApp::promptUserParcelQuery() {
     ParcelQuery query;
     query.id = ConsoleInput::promptOptionalText("请输入快递单号（可留空）");
@@ -387,6 +402,7 @@ ParcelQuery Stage1ConsoleApp::promptUserParcelQuery() {
     return query;
 }
 
+// 提示管理员输入快递查询条件。
 ParcelQuery Stage1ConsoleApp::promptAdminParcelQuery() {
     ParcelQuery query;
     query.id = ConsoleInput::promptOptionalText("请输入快递单号（可留空）");
@@ -402,6 +418,7 @@ ParcelQuery Stage1ConsoleApp::promptAdminParcelQuery() {
     return query;
 }
 
+// 提示输入可选快递状态。
 std::optional<ParcelStatus> Stage1ConsoleApp::promptOptionalParcelStatus(
     std::string_view label) {
     std::cout << label << '\n';
@@ -420,6 +437,7 @@ std::optional<ParcelStatus> Stage1ConsoleApp::promptOptionalParcelStatus(
     }
 }
 
+// 解析空格或逗号分隔的选择序号。
 std::optional<std::vector<size_t>> Stage1ConsoleApp::parseSelectionIndices(
     std::string_view input,
     size_t maxCount) {
@@ -471,6 +489,7 @@ std::optional<std::vector<size_t>> Stage1ConsoleApp::parseSelectionIndices(
     return indices;
 }
 
+// 返回快递状态显示文本。
 std::string Stage1ConsoleApp::parcelStatusText(ParcelStatus status) {
     switch (status) {
         case ParcelStatus::WaitingForSign:
@@ -482,6 +501,7 @@ std::string Stage1ConsoleApp::parcelStatusText(ParcelStatus status) {
     return "未知";
 }
 
+// 格式化时间戳用于控制台显示。
 std::string Stage1ConsoleApp::formatTimestampForDisplay(
     std::string_view timestamp) {
     if (timestamp.empty()) {
@@ -495,6 +515,7 @@ std::string Stage1ConsoleApp::formatTimestampForDisplay(
     }
 }
 
+// 打印快递列表。
 void Stage1ConsoleApp::printParcelList(const std::vector<Parcel>& parcels) {
     if (parcels.empty()) {
         std::cout << "没有符合条件的快递。\n";
@@ -516,6 +537,7 @@ void Stage1ConsoleApp::printParcelList(const std::vector<Parcel>& parcels) {
     }
 }
 
+// 打印用户列表。
 void Stage1ConsoleApp::printUserList(const std::vector<User>& users) {
     if (users.empty()) {
         std::cout << "暂无注册用户。\n";
@@ -532,6 +554,7 @@ void Stage1ConsoleApp::printUserList(const std::vector<User>& users) {
     }
 }
 
+// 运行阶段 1 控制台主循环。
 int Stage1ConsoleApp::run() {
     std::cout << "ExpressFlow Stage 1" << '\n';
 

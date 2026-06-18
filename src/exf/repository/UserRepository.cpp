@@ -27,7 +27,7 @@ void UserRepository::saveUsers() {
     storage_.writeLines("users.txt", lines);
 }
 
-const User* UserRepository::findUser(const std::string_view& username) const {
+const User* UserRepository::findUser(std::string_view username) const {
     auto it = std::find_if(
         users_.begin(), users_.end(),
         [&username](const User& user) { return user.username() == username; });
@@ -40,7 +40,7 @@ void UserRepository::createUser(const User& user) {
     saveUsers();
 }
 
-void UserRepository::deleteUser(const std::string_view& username) {
+void UserRepository::deleteUser(std::string_view username) {
     auto it = std::find_if(
         users_.begin(), users_.end(),
         [&username](const User& user) { return user.username() == username; });
@@ -51,7 +51,7 @@ void UserRepository::deleteUser(const std::string_view& username) {
     saveUsers();
 }
 
-void UserRepository::updateUser(const std::string_view& username, const User& user) {
+void UserRepository::updateUser(std::string_view username, const User& user) {
     auto it = std::find_if(
         users_.begin(), users_.end(),
         [&username](const User& user) { return user.username() == username; });
