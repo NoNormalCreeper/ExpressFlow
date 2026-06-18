@@ -42,6 +42,12 @@ int Stage3ServerApp::run(const std::string& host, uint16_t port) {
             std::cerr << server.lastError() << '\n';
             continue;
         }
+        if (activeClients_.load() >= kMaxClients) {
+            connection->sendLine(Stage3Protocol::encodeResponse(
+                Stage3Response::error("ServerBusy", "服务器繁忙，请稍后再试")));
+            continue;
+        }
+        ++activeClients_;
         std::thread(&Stage3ServerApp::handleClient, this,
                     std::move(*connection))
             .detach();
@@ -52,13 +58,14 @@ void Stage3ServerApp::handleClient(TcpConnection connection) {
     while (connection.isOpen()) {
         auto line = connection.receiveLine();
         if (!line.has_value()) {
-            return;
+            break;
         }
         const auto response = dispatcher_.handleLine(*line);
         if (!connection.sendLine(response)) {
-            return;
+            break;
         }
     }
+    --activeClients_;
 }
 
 }  // namespace exf

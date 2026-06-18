@@ -1,19 +1,25 @@
 #include "exf/app/stage3/Stage3ClientService.hpp"
 
+#include <chrono>
 #include <exception>
+#include <thread>
 #include <utility>
 
 #include "exf/storage/RecordCodec.hpp"
 
 namespace exf {
+namespace {
+
+constexpr int kReconnectAttempts = 3;
+
+}  // namespace
 
 Stage3ClientService::Stage3ClientService(std::string host, uint16_t port)
     : host_(std::move(host)), port_(port) {}
 
 bool Stage3ClientService::connect() {
     if (!client_.connectTo(host_, port_)) {
-        lastError_ = client_.lastError();
-        return false;
+        return reconnect();
     }
     lastError_.clear();
     return true;
@@ -177,16 +183,27 @@ std::optional<Stage3Response> Stage3ClientService::pickupParcel(
 std::optional<Stage3Response> Stage3ClientService::sendRequest(
     const Stage3Request& request) {
     lastError_.clear();
+    if (!client_.connection().isOpen()) {
+        clearLoginState();
+        if (reconnect()) {
+            lastError_ = "连接已恢复，请重新登录后重试。";
+        }
+        return std::nullopt;
+    }
     if (!client_.connection().sendLine(
             Stage3Protocol::encodeRequest(request))) {
-        lastError_ = "请求发送失败。";
         clearLoginState();
+        if (reconnect()) {
+            lastError_ = "请求发送失败，连接已恢复，请重新登录后重试。";
+        }
         return std::nullopt;
     }
     auto line = client_.connection().receiveLine();
     if (!line.has_value()) {
-        lastError_ = "服务端连接已断开。";
         clearLoginState();
+        if (reconnect()) {
+            lastError_ = "服务端连接已断开，连接已恢复，请重新登录后重试。";
+        }
         return std::nullopt;
     }
     auto response = Stage3Protocol::decodeResponse(*line);
@@ -195,6 +212,18 @@ std::optional<Stage3Response> Stage3ClientService::sendRequest(
         return std::nullopt;
     }
     return response;
+}
+
+bool Stage3ClientService::reconnect() {
+    for (int i = 0; i < kReconnectAttempts; ++i) {
+        if (client_.connectTo(host_, port_)) {
+            lastError_.clear();
+            return true;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    }
+    lastError_ = client_.lastError();
+    return false;
 }
 
 void Stage3ClientService::clearLoginState() {

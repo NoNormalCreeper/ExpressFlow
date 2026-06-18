@@ -18,4 +18,14 @@ TEST(Stage3SessionManagerTest, CreatesFindsAndRemovesSessions) {
     EXPECT_FALSE(sessions.findSession(token).has_value());
 }
 
+TEST(Stage3SessionManagerTest, NewLoginInvalidatesOldSessionForSameAccount) {
+    exf::Stage3SessionManager sessions;
+
+    const auto oldToken = sessions.createSession(exf::Stage3Role::User, "u1");
+    const auto newToken = sessions.createSession(exf::Stage3Role::User, "u1");
+
+    EXPECT_FALSE(sessions.findSession(oldToken).has_value());
+    EXPECT_TRUE(sessions.findSession(newToken).has_value());
+}
+
 }  // namespace

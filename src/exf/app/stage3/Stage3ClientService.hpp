@@ -169,6 +169,7 @@ class Stage3ClientService {
     /** 最近一次错误。 */
     std::string lastError_;
 
+    bool reconnect();
     void clearLoginState();
     std::optional<Stage3Response> sendRequest(
         const Stage3Request& request);

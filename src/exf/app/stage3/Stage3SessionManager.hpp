@@ -66,6 +66,9 @@ class Stage3SessionManager {
 
     /** 登录态表。 */
     std::unordered_map<std::string, Stage3Session> sessions_;
+
+    /** 账号到当前 token 的映射，用于限制单账号单会话。 */
+    std::unordered_map<std::string, std::string> accountTokens_;
 };
 
 }  // namespace exf

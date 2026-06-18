@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <cstdint>
 #include <filesystem>
 
@@ -34,6 +35,8 @@ class Stage3ServerApp {
     int run(const std::string& host, uint16_t port);
 
    private:
+    static constexpr unsigned int kMaxClients = 32;
+
     /** 网络版独立文件存储。 */
     FileStorage storage_;
 
@@ -66,6 +69,9 @@ class Stage3ServerApp {
 
     /** 请求分发器。 */
     Stage3RequestDispatcher dispatcher_;
+
+    /** 当前在线连接数。 */
+    std::atomic<unsigned int> activeClients_{0};
 
     void handleClient(TcpConnection connection);
 };

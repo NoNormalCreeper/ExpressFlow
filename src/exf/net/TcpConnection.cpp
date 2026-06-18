@@ -1,10 +1,16 @@
 #include "exf/net/TcpConnection.hpp"
 
 #include <cerrno>
+#include <cstddef>
 #include <sys/socket.h>
 #include <unistd.h>
 
 namespace exf {
+namespace {
+
+constexpr size_t kMaxLineLength = 8192;
+
+}  // namespace
 
 TcpConnection::TcpConnection() : fd_(-1) {}
 
@@ -67,6 +73,10 @@ std::optional<std::string> TcpConnection::receiveLine() {
         }
         if (ch != '\r') {
             line.push_back(ch);
+            if (line.size() > kMaxLineLength) {
+                close();
+                return std::nullopt;
+            }
         }
     }
 }
