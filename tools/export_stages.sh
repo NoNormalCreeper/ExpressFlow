@@ -36,16 +36,16 @@ export_stage() {
     } > "$stage_dir/EXPORT_INFO.txt"
 }
 
-export_stage stage1 stage1-basic-system
-export_stage stage2 stage2-deliveryman-tasks
-export_stage stage3 stage3-socket-cs
+export_stage task1 stage1-basic-system
+export_stage task2 stage2-deliveryman-tasks
+export_stage task3 stage3-socket-cs
 
 cat > "$output_dir/README.txt" <<EOF
 ExpressFlow staged export
 
-stage1/ -> stage1-basic-system
-stage2/ -> stage2-deliveryman-tasks
-stage3/ -> stage3-socket-cs
+task1/ -> stage1-basic-system
+task2/ -> stage2-deliveryman-tasks
+task3/ -> stage3-socket-cs
 
 Each directory is exported from the commit recorded in EXPORT_INFO.txt.
 Uncommitted working-tree files are not included.
